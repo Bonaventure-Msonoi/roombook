@@ -40,7 +40,7 @@
                                         </td>
                                         <td class="px-6 py-4 text-right">
                                             @if ($booking->ends_at->isFuture())
-                                                <form method="POST" action="{{ route('bookings.destroy', $booking) }}" class="inline"
+                                                <form method="POST" action="{{ route('boardroom.bookings.destroy', $booking) }}" class="inline"
                                                       onsubmit="return confirm('Cancel this booking?')">
                                                     @csrf
                                                     @method('DELETE')

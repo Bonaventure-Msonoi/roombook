@@ -17,7 +17,7 @@
                 @if ($bookings->isEmpty())
                     <div class="p-6 text-gray-500 text-sm">
                         You have no upcoming bookings.
-                        <a href="{{ route('bookings.create') }}" class="text-indigo-600 hover:text-indigo-800">Book a room</a>
+                        <a href="{{ route('boardroom.bookings.create') }}" class="text-indigo-600 hover:text-indigo-800">Book a room</a>
                     </div>
                 @else
                     <div class="divide-y divide-gray-200">
@@ -32,7 +32,7 @@
                                     </p>
                                 </div>
                                 @if ($booking->ends_at->isFuture())
-                                    <form method="POST" action="{{ route('bookings.destroy', $booking) }}"
+                                    <form method="POST" action="{{ route('boardroom.bookings.destroy', $booking) }}"
                                           onsubmit="return confirm('Cancel this booking?')">
                                         @csrf
                                         @method('DELETE')

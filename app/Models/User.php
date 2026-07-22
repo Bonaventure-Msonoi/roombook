@@ -13,11 +13,17 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    public const ROLE_USER = 'user';
+
+    public const ROLE_ADMIN = 'admin';
+
+    public const ROLE_SUPER_USER = 'super_user';
+
     protected $fillable = [
         'name',
         'email',
         'password',
-        'is_admin',
+        'role',
     ];
 
     protected $hidden = [
@@ -30,7 +36,6 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'is_admin' => 'boolean',
         ];
     }
 
@@ -39,8 +44,38 @@ class User extends Authenticatable
         return $this->hasMany(Booking::class);
     }
 
+    public function vehicleBookings(): HasMany
+    {
+        return $this->hasMany(VehicleBooking::class);
+    }
+
+    public function isUser(): bool
+    {
+        return $this->role === self::ROLE_USER;
+    }
+
     public function isAdmin(): bool
     {
-        return $this->is_admin;
+        return in_array($this->role, [self::ROLE_ADMIN, self::ROLE_SUPER_USER], true);
+    }
+
+    public function isSuperUser(): bool
+    {
+        return $this->role === self::ROLE_SUPER_USER;
+    }
+
+    public function canAccessAdminDashboard(): bool
+    {
+        return $this->isAdmin();
+    }
+
+    public function canManageVehicles(): bool
+    {
+        return $this->isSuperUser();
+    }
+
+    public function canCancelAnyBooking(): bool
+    {
+        return $this->isAdmin();
     }
 }

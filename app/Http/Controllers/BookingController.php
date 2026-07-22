@@ -59,7 +59,7 @@ class BookingController extends Controller
         ]);
 
         return redirect()
-            ->route('dashboard')
+            ->route('boardroom.dashboard')
             ->with('status', 'Room booked successfully.');
     }
 

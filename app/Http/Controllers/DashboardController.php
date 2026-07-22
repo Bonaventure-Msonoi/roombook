@@ -45,7 +45,7 @@ class DashboardController extends Controller
 
         $maxBookingDate = now()->addMonths(6);
 
-        return view('dashboard', [
+        return view('boardroom.dashboard', [
             'rooms' => $rooms,
             'roomsJson' => $rooms->map(fn (Room $room) => [
                 'id' => $room->id,

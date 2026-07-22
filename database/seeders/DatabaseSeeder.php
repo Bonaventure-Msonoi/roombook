@@ -13,11 +13,21 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::updateOrCreate(
+            ['email' => 'super@roombook.local'],
+            [
+                'name' => 'Super User',
+                'password' => 'password',
+                'role' => User::ROLE_SUPER_USER,
+                'email_verified_at' => now(),
+            ]
+        );
+
+        User::updateOrCreate(
             ['email' => 'admin@roombook.local'],
             [
                 'name' => 'Admin User',
                 'password' => 'password',
-                'is_admin' => true,
+                'role' => User::ROLE_ADMIN,
                 'email_verified_at' => now(),
             ]
         );
@@ -27,7 +37,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Staff User',
                 'password' => 'password',
-                'is_admin' => false,
+                'role' => User::ROLE_USER,
                 'email_verified_at' => now(),
             ]
         );

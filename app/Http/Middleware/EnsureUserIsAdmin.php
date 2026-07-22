@@ -10,7 +10,7 @@ class EnsureUserIsAdmin
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->user()?->isAdmin()) {
+        if (! $request->user()?->canAccessAdminDashboard()) {
             abort(403, 'Admin access required.');
         }
 

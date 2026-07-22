@@ -7,7 +7,7 @@
                 </h2>
                 <p class="text-sm text-gray-500 mt-1">Capacity: {{ $room->capacity }} people</p>
             </div>
-            <a href="{{ route('bookings.create', ['room' => $room->id, 'date' => $date->toDateString()]) }}"
+            <a href="{{ route('boardroom.bookings.create', ['room' => $room->id, 'date' => $date->toDateString()]) }}"
                class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
                 Book this room
             </a>
@@ -26,9 +26,9 @@
                         Bookings for {{ $date->format('l, M j, Y') }}
                     </h3>
                     <div class="flex gap-2">
-                        <a href="{{ route('rooms.show', ['room' => $room, 'date' => $date->copy()->subDay()->toDateString()]) }}"
+                        <a href="{{ route('boardroom.rooms.show', ['room' => $room, 'date' => $date->copy()->subDay()->toDateString()]) }}"
                            class="px-3 py-1 text-sm border rounded-md text-gray-600 hover:bg-gray-50">Previous</a>
-                        <a href="{{ route('rooms.show', ['room' => $room, 'date' => $date->copy()->addDay()->toDateString()]) }}"
+                        <a href="{{ route('boardroom.rooms.show', ['room' => $room, 'date' => $date->copy()->addDay()->toDateString()]) }}"
                            class="px-3 py-1 text-sm border rounded-md text-gray-600 hover:bg-gray-50">Next</a>
                     </div>
                 </div>
