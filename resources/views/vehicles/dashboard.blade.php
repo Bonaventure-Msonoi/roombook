@@ -102,9 +102,15 @@
                     @csrf
 
                     <div>
-                        <x-input-label for="modal_title" :value="__('Meeting title / purpose')" />
+                        <x-input-label for="modal_title" :value="__('Trip purpose')" />
                         <x-text-input id="modal_title" name="title" type="text" class="mt-1 block w-full"
                                       value="{{ old('title') }}" required />
+                    </div>
+
+                    <div>
+                        <x-input-label for="modal_destination" :value="__('Destination (location)')" />
+                        <x-text-input id="modal_destination" name="destination" type="text" class="mt-1 block w-full"
+                                      value="{{ old('destination') }}" required placeholder="e.g. Airport, HQ campus" />
                     </div>
 
                     <div>
@@ -169,7 +175,7 @@
                 .vehicle-day-calendar { min-height: 520px; }
             }
             .fc-event { cursor: pointer; }
-            .fc .fc-highlight { background: rgba(99, 102, 241, 0.2); }
+            .fc .fc-highlight { background: rgba(120, 213, 225, 0.28); }
             @media (max-width: 639px) {
                 .fc .fc-toolbar { flex-wrap: wrap; gap: 0.5rem; }
                 .fc .fc-toolbar-title { font-size: 1rem; }
@@ -415,7 +421,9 @@
 
                     handleEventClick(info) {
                         const props = info.event.extendedProps;
-                        const message = props.vehicle + '\n' + info.event.title + '\nBooked by: ' + props.bookedBy;
+                        const message = props.vehicle + '\n' + info.event.title +
+                            (props.destination ? '\nDestination: ' + props.destination : '') +
+                            '\nBooked by: ' + props.bookedBy;
 
                         if (props.canCancel && confirm(message + '\n\nCancel this booking?')) {
                             const token = document.querySelector('meta[name="csrf-token"]').content;

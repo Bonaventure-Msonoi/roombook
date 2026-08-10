@@ -60,6 +60,7 @@ class VehicleBookingController extends Controller
             'vehicle_id' => $request->integer('vehicle_id'),
             'user_id' => $ownerId,
             'title' => $request->input('title'),
+            'destination' => $request->input('destination'),
             'starts_at' => $request->input('starts_at'),
             'ends_at' => $request->input('ends_at'),
             'status' => 'confirmed',
@@ -77,6 +78,7 @@ class VehicleBookingController extends Controller
             [
                 'vehicle' => $booking->vehicle?->displayName(),
                 'owner' => $booking->user?->email,
+                'destination' => $booking->destination,
                 'starts_at' => (string) $booking->starts_at,
                 'ends_at' => (string) $booking->ends_at,
                 'reason' => $request->input('reason'),
@@ -126,6 +128,7 @@ class VehicleBookingController extends Controller
             'vehicle_id' => $vehicleBooking->vehicle_id,
             'user_id' => $vehicleBooking->user_id,
             'title' => $vehicleBooking->title,
+            'destination' => $vehicleBooking->destination,
             'starts_at' => (string) $vehicleBooking->starts_at,
             'ends_at' => (string) $vehicleBooking->ends_at,
         ];
@@ -133,6 +136,7 @@ class VehicleBookingController extends Controller
         $data = [
             'vehicle_id' => $request->integer('vehicle_id'),
             'title' => $request->input('title'),
+            'destination' => $request->input('destination'),
             'starts_at' => $request->input('starts_at'),
             'ends_at' => $request->input('ends_at'),
         ];
@@ -154,6 +158,7 @@ class VehicleBookingController extends Controller
                     'vehicle_id' => $vehicleBooking->vehicle_id,
                     'user_id' => $vehicleBooking->user_id,
                     'title' => $vehicleBooking->title,
+                    'destination' => $vehicleBooking->destination,
                     'starts_at' => (string) $vehicleBooking->starts_at,
                     'ends_at' => (string) $vehicleBooking->ends_at,
                     'vehicle' => $vehicleBooking->vehicle?->displayName(),

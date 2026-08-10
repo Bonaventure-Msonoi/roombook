@@ -18,8 +18,10 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Super User',
                 'password' => 'password',
                 'role' => User::ROLE_SUPER_USER,
+                'department' => 'IT & Digital Transformation',
                 'email_verified_at' => now(),
                 'is_active' => true,
+                'approved_at' => now(),
             ]
         );
 
@@ -29,8 +31,10 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Admin User',
                 'password' => 'password',
                 'role' => User::ROLE_ADMIN,
+                'department' => 'Operations Dept',
                 'email_verified_at' => now(),
                 'is_active' => true,
+                'approved_at' => now(),
             ]
         );
 
@@ -40,8 +44,10 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Staff User',
                 'password' => 'password',
                 'role' => User::ROLE_USER,
+                'department' => 'HR',
                 'email_verified_at' => now(),
                 'is_active' => true,
+                'approved_at' => now(),
             ]
         );
 

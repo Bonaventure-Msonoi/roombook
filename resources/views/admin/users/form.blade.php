@@ -30,6 +30,19 @@
                     </div>
 
                     <div>
+                        <x-input-label for="department" value="Department" />
+                        <select id="department" name="department"
+                            class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                            required>
+                            <option value="" disabled @selected(! old('department', $user->department))>Select department</option>
+                            @foreach ($departments as $department)
+                                <option value="{{ $department }}" @selected(old('department', $user->department) === $department)>{{ $department }}</option>
+                            @endforeach
+                        </select>
+                        <x-input-error :messages="$errors->get('department')" class="mt-1" />
+                    </div>
+
+                    <div>
                         <x-input-label for="role" value="Role" />
                         <select id="role" name="role"
                             class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"

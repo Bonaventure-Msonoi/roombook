@@ -8,8 +8,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Vehicle extends Model
 {
     public const CATEGORIES = [
-        'SUV',
         'Saloon',
+        'Minibus',
+        'SUV',
         'Pickup',
         'Van',
         'Hatchback',

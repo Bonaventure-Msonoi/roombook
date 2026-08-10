@@ -27,7 +27,7 @@
                             :href="route('boardroom.dashboard')"
                             title="Book Boardroom"
                             description="Reserve meeting rooms and boardrooms for your team."
-                            variant="indigo"
+                            variant="red"
                         >
                             <x-slot:icon>
                                 <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -42,7 +42,7 @@
                             :href="route('vehicles.dashboard')"
                             title="Pool Vehicle"
                             description="Book pool vehicles for official trips and errands."
-                            variant="emerald"
+                            variant="turquoise"
                         >
                             <x-slot:icon>
                                 <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -60,6 +60,7 @@
 
             @php
                 $showAdminTools = $user->canAccessAdminDashboard()
+                    || $user->canViewAnalytics()
                     || $user->canManageVehicles()
                     || $user->canManageUsers()
                     || $user->canManageRolePrivileges()
@@ -67,43 +68,49 @@
             @endphp
 
             @if ($showAdminTools)
-                <div class="mt-8 sm:mt-10 rounded-lg border border-amber-200 bg-amber-50 p-4 sm:p-6">
-                    <h4 class="font-semibold text-amber-900">Admin tools</h4>
-                    <p class="text-sm text-amber-800 mt-1">Shortcuts based on your role privileges.</p>
+                <div class="mt-8 sm:mt-10 rounded-lg border border-brand-orange-200 bg-brand-orange-50 p-4 sm:p-6">
+                    <h4 class="font-semibold text-brand-orange-900">Admin tools</h4>
+                    <p class="text-sm text-brand-orange-800 mt-1">Shortcuts based on your role privileges.</p>
                     <div class="mt-4 flex flex-wrap gap-3">
+                        @if ($user->canViewAnalytics())
+                            <a href="{{ route('admin.analytics.index') }}"
+                               class="inline-flex items-center px-4 py-2 bg-brand-orange text-white text-sm font-medium rounded-md hover:bg-brand-orange-700">
+                                Analytics
+                            </a>
+                        @endif
                         @if ($user->canManageVehicles())
                             <a href="{{ route('admin.vehicles.index') }}"
-                               class="inline-flex items-center px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-md hover:bg-amber-700">
+                               class="inline-flex items-center px-4 py-2 bg-brand-orange text-white text-sm font-medium rounded-md hover:bg-brand-orange-700">
                                 Manage vehicles
                             </a>
                         @endif
                         @if ($user->canManageUsers())
                             <a href="{{ route('admin.users.index') }}"
-                               class="inline-flex items-center px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-md hover:bg-amber-700">
+                               class="inline-flex items-center px-4 py-2 bg-brand-orange text-white text-sm font-medium rounded-md hover:bg-brand-orange-700">
                                 Manage users
                             </a>
                         @endif
                         @if ($user->canManageRolePrivileges())
                             <a href="{{ route('admin.role-privileges.edit') }}"
-                               class="inline-flex items-center px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-md hover:bg-amber-700">
+                               class="inline-flex items-center px-4 py-2 bg-brand-orange text-white text-sm font-medium rounded-md hover:bg-brand-orange-700">
                                 Role privileges
                             </a>
                         @endif
                         @if ($user->canViewAuditLog())
                             <a href="{{ route('admin.audit-logs.index') }}"
-                               class="inline-flex items-center px-4 py-2 border border-amber-300 text-amber-900 text-sm font-medium rounded-md hover:bg-amber-100">
+                               class="inline-flex items-center px-4 py-2 border border-brand-turquoise-300 text-brand-turquoise-900 text-sm font-medium rounded-md hover:bg-brand-turquoise-50">
                                 Audit log
                             </a>
                         @endif
                         @if ($user->canAccessAdminDashboard() && $user->canBookBoardroom())
                             <a href="{{ route('boardroom.bookings.admin') }}"
-                               class="inline-flex items-center px-4 py-2 border border-amber-300 text-amber-900 text-sm font-medium rounded-md hover:bg-amber-100">
+                               class="inline-flex items-center px-4 py-2 border border-brand-emerald-300 text-brand-emerald-900 text-sm font-medium rounded-md hover:bg-brand-emerald-50">
                                 Boardroom bookings
                             </a>
                         @endif
                         @if ($user->canAccessAdminDashboard() && $user->canBookVehicles())
                             <a href="{{ route('vehicles.bookings.admin') }}"
-                               class="inline-flex items-center px-4 py-2 border border-amber-300 text-amber-900 text-sm font-medium rounded-md hover:bg-amber-100">
+                               class="inline-flex items-center px-4 py-2 border border-brand-turquoise-300 text-brand-turquoise-900 text-sm font-medium rounded-md hover:bg-brand-turquoise-50">
                                 Vehicle bookings
                             </a>
                         @endif

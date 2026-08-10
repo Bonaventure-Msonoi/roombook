@@ -13,15 +13,21 @@ class EnsureUserIsActive
     {
         $user = $request->user();
 
-        if ($user && ! $user->isActive()) {
+        if ($user && (! $user->isActive() || $user->isPendingApproval() || $user->isRejected())) {
             Auth::guard('web')->logout();
 
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
+            $message = match (true) {
+                $user->isPendingApproval() => 'Your account is waiting for approval. Please contact an administrator.',
+                $user->isRejected() => 'Your signup request was not approved. Contact an administrator.',
+                default => 'Your account has been deactivated. Contact an administrator.',
+            };
+
             return redirect()
                 ->route('login')
-                ->with('error', 'Your account has been deactivated. Contact an administrator.');
+                ->with('error', $message);
         }
 
         return $next($request);

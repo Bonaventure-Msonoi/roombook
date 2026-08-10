@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\RolePrivilegeController;
 use App\Http\Controllers\Admin\UserManagementController;
@@ -64,6 +65,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('bookings.admin');
     });
 
+    Route::get('/admin/analytics', [AnalyticsController::class, 'index'])
+        ->middleware('privilege:'.Privileges::VIEW_ADMIN_BOOKINGS)
+        ->name('admin.analytics.index');
+    Route::get('/admin/analytics/export', [AnalyticsController::class, 'export'])
+        ->middleware('privilege:'.Privileges::VIEW_ADMIN_BOOKINGS)
+        ->name('admin.analytics.export');
+
     Route::get('/admin/audit-logs', [AuditLogController::class, 'index'])
         ->middleware('privilege:'.Privileges::VIEW_AUDIT_LOG)
         ->name('admin.audit-logs.index');
@@ -80,6 +88,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/{user}/edit', [UserManagementController::class, 'edit'])->name('edit');
         Route::put('/{user}', [UserManagementController::class, 'update'])->name('update');
         Route::patch('/{user}/reset-password', [UserManagementController::class, 'resetPassword'])->name('reset-password');
+        Route::patch('/{user}/approve', [UserManagementController::class, 'approve'])->name('approve');
+        Route::patch('/{user}/reject', [UserManagementController::class, 'reject'])->name('reject');
         Route::patch('/{user}/deactivate', [UserManagementController::class, 'deactivate'])->name('deactivate');
         Route::patch('/{user}/reactivate', [UserManagementController::class, 'reactivate'])->name('reactivate');
     });

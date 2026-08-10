@@ -169,7 +169,7 @@
                 .room-day-calendar { min-height: 520px; }
             }
             .fc-event { cursor: pointer; }
-            .fc .fc-highlight { background: rgba(99, 102, 241, 0.2); }
+            .fc .fc-highlight { background: rgba(237, 27, 46, 0.18); }
             @media (max-width: 639px) {
                 .fc .fc-toolbar { flex-wrap: wrap; gap: 0.5rem; }
                 .fc .fc-toolbar-title { font-size: 1rem; }

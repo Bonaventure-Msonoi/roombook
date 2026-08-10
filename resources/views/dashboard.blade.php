@@ -162,7 +162,7 @@
             #week-calendar, .room-day-calendar { min-height: 650px; }
             .room-day-calendar { min-height: 520px; }
             .fc-event { cursor: pointer; }
-            .fc .fc-highlight { background: rgba(99, 102, 241, 0.2); }
+            .fc .fc-highlight { background: rgba(237, 27, 46, 0.18); }
         </style>
     @endpush
 

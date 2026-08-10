@@ -12,6 +12,9 @@
                             <div class="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                                 <div>
                                     <p class="font-semibold">{{ $booking->title }}</p>
+                                    @if ($booking->destination)
+                                        <p class="text-sm text-gray-600">Destination: {{ $booking->destination }}</p>
+                                    @endif
                                     <p class="text-sm text-gray-600">{{ $booking->vehicle->displayName() }}</p>
                                     <p class="text-sm text-gray-500">{{ $booking->starts_at->format('D, M j, Y g:i A') }} – {{ $booking->ends_at->format('g:i A') }}</p>
                                 </div>

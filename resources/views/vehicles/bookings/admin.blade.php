@@ -4,7 +4,7 @@
             <h2 class="font-semibold text-xl text-gray-800">{{ __('All Vehicle Bookings') }}</h2>
             @if (Auth::user()->canBookOnBehalf())
                 <a href="{{ route('vehicles.bookings.create') }}"
-                   class="inline-flex items-center justify-center px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-md hover:bg-emerald-700">
+                   class="inline-flex items-center justify-center px-4 py-2 bg-brand-turquoise-600 text-white text-sm font-medium rounded-md hover:bg-brand-turquoise-700">
                     Book on behalf
                 </a>
             @endif
@@ -28,6 +28,9 @@
                             <div class="p-4 space-y-3">
                                 <div>
                                     <p class="font-semibold text-gray-900">{{ $booking->title }}</p>
+                                    @if ($booking->destination)
+                                        <p class="text-sm text-gray-600">Destination: {{ $booking->destination }}</p>
+                                    @endif
                                     <p class="text-sm text-gray-600">{{ $booking->vehicle->displayName() }}</p>
                                     <p class="text-sm text-gray-500 mt-1">
                                         {{ $booking->starts_at->format('M j, g:i A') }}
@@ -58,6 +61,7 @@
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vehicle</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Purpose</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Destination</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Booked by</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">When</th>
                                     <th class="px-6 py-3"></th>
@@ -68,6 +72,7 @@
                                     <tr>
                                         <td class="px-6 py-4 text-sm">{{ $booking->vehicle->displayName() }}</td>
                                         <td class="px-6 py-4 text-sm">{{ $booking->title }}</td>
+                                        <td class="px-6 py-4 text-sm">{{ $booking->destination ?: '—' }}</td>
                                         <td class="px-6 py-4 text-sm">{{ $booking->user->name }}</td>
                                         <td class="px-6 py-4 text-sm">{{ $booking->starts_at->format('M j, g:i A') }} – {{ $booking->ends_at->format('g:i A') }}</td>
                                         <td class="px-6 py-4 text-right space-x-3 whitespace-nowrap">

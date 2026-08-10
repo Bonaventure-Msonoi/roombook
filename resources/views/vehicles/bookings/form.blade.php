@@ -33,6 +33,14 @@
                         <x-input-error class="mt-2" :messages="$errors->get('title')" />
                     </div>
 
+                    <div>
+                        <x-input-label for="destination" :value="__('Destination (location)')" />
+                        <x-text-input id="destination" name="destination" type="text" class="mt-1 block w-full"
+                                      :value="old('destination', $booking->destination)" required
+                                      placeholder="e.g. Airport, HQ campus" />
+                        <x-input-error class="mt-2" :messages="$errors->get('destination')" />
+                    </div>
+
                     @if ($canReassign)
                         <div>
                             <x-input-label for="user_id" :value="__('Booked for')" />

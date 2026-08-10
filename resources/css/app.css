@@ -1,3 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+    --brand-red: #ed1b2e;
+    --brand-soft: #ff8da1;
+    --brand-emerald: #9be198;
+    --brand-orange: #ff5c39;
+    --brand-turquoise: #78d5e1;
+    --brand-surface: #f7f7f8;
+}
+
+@layer base {
+    body {
+        color: #1f2937;
+    }
+}
+
+@layer components {
+    .brand-page-bg {
+        background-color: var(--brand-surface);
+    }
+
+    .brand-guest-bg {
+        background-color: var(--brand-surface);
+    }
+}

@@ -2,10 +2,12 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -42,18 +44,42 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt(
+        if (Auth::attempt(
             array_merge($this->only('email', 'password'), ['is_active' => true]),
             $this->boolean('remember')
         )) {
+            RateLimiter::clear($this->throttleKey());
+
+            return;
+        }
+
+        $user = User::where('email', $this->string('email'))->first();
+
+        if ($user && Hash::check($this->string('password'), $user->password)) {
             RateLimiter::hit($this->throttleKey());
 
+            if ($user->isPendingApproval()) {
+                throw ValidationException::withMessages([
+                    'email' => 'Your account is waiting for approval. Please contact an administrator.',
+                ]);
+            }
+
+            if ($user->isRejected()) {
+                throw ValidationException::withMessages([
+                    'email' => 'Your signup request was not approved. Contact an administrator.',
+                ]);
+            }
+
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'email' => 'Your account has been deactivated. Contact an administrator.',
             ]);
         }
 
-        RateLimiter::clear($this->throttleKey());
+        RateLimiter::hit($this->throttleKey());
+
+        throw ValidationException::withMessages([
+            'email' => trans('auth.failed'),
+        ]);
     }
 
     /**

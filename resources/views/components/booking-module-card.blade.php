@@ -2,25 +2,37 @@
     'href',
     'title',
     'description',
-    'variant' => 'indigo',
+    'variant' => 'red',
 ])
 
 @php
     $styles = match ($variant) {
         'emerald' => [
-            'border' => 'border-emerald-100 hover:border-emerald-500',
-            'iconBg' => 'bg-emerald-100 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white',
+            'border' => 'border-brand-emerald-200 hover:border-brand-emerald',
+            'iconBg' => 'bg-brand-emerald-100 text-brand-emerald-700 group-hover:bg-brand-emerald group-hover:text-brand-emerald-900',
+            'accent' => 'from-brand-emerald-50 to-white',
+        ],
+        'turquoise' => [
+            'border' => 'border-brand-turquoise-200 hover:border-brand-turquoise',
+            'iconBg' => 'bg-brand-turquoise-100 text-brand-turquoise-700 group-hover:bg-brand-turquoise group-hover:text-brand-turquoise-900',
+            'accent' => 'from-brand-turquoise-50 to-white',
+        ],
+        'orange' => [
+            'border' => 'border-brand-orange-200 hover:border-brand-orange',
+            'iconBg' => 'bg-brand-orange-100 text-brand-orange-700 group-hover:bg-brand-orange group-hover:text-white',
+            'accent' => 'from-brand-orange-50 to-white',
         ],
         default => [
-            'border' => 'border-indigo-100 hover:border-indigo-500',
-            'iconBg' => 'bg-indigo-100 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white',
+            'border' => 'border-brand-red-100 hover:border-brand-red',
+            'iconBg' => 'bg-brand-red-100 text-brand-red group-hover:bg-brand-red group-hover:text-white',
+            'accent' => 'from-brand-soft-50 to-white',
         ],
     };
 @endphp
 
 <a href="{{ $href }}"
    {{ $attributes->merge([
-       'class' => "group block rounded-xl border-2 bg-white p-6 sm:p-8 shadow-sm hover:shadow-md transition {$styles['border']}",
+       'class' => "group block rounded-xl border-2 bg-gradient-to-br {$styles['accent']} p-6 sm:p-8 shadow-sm hover:shadow-md transition {$styles['border']}",
    ]) }}>
     <div class="flex h-14 w-14 items-center justify-center rounded-full mb-4 transition {{ $styles['iconBg'] }}">
         {{ $icon }}

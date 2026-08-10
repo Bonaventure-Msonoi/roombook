@@ -13,6 +13,7 @@ class VehicleBooking extends Model
         'vehicle_id',
         'user_id',
         'title',
+        'destination',
         'starts_at',
         'ends_at',
         'status',

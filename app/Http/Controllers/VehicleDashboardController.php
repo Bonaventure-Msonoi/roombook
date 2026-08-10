@@ -32,6 +32,7 @@ class VehicleDashboardController extends Controller
                 'extendedProps' => [
                     'bookedBy' => $booking->user->name,
                     'vehicle' => $booking->vehicle->displayName(),
+                    'destination' => $booking->destination,
                     'canCancel' => $booking->user_id === auth()->id() || auth()->user()->canCancelAnyBooking(),
                 ],
             ]);

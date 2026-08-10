@@ -19,6 +19,7 @@ class StoreVehicleBookingRequest extends FormRequest
         $rules = [
             'vehicle_id' => ['required', 'exists:vehicles,id'],
             'title' => ['required', 'string', 'max:255'],
+            'destination' => ['required', 'string', 'max:255'],
             'starts_at' => ['required', 'date', 'after:now', 'before:'.now()->addMonths(6)->endOfDay()->toDateTimeString()],
             'ends_at' => ['required', 'date', 'after:starts_at', 'before:'.now()->addMonths(6)->endOfDay()->toDateTimeString()],
             'reason' => ['nullable', 'string', 'max:500'],

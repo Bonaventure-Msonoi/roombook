@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+<nav x-data="{ open: false }" class="bg-white/90 backdrop-blur border-b border-brand-soft-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
@@ -18,6 +18,11 @@
                     @if (Auth::user()->canBookVehicles())
                         <x-nav-link :href="route('vehicles.dashboard')" :active="request()->routeIs('vehicles.*')">
                             {{ __('Pool Vehicle') }}
+                        </x-nav-link>
+                    @endif
+                    @if (Auth::user()->canViewAnalytics())
+                        <x-nav-link :href="route('admin.analytics.index')" :active="request()->routeIs('admin.analytics.*')">
+                            {{ __('Analytics') }}
                         </x-nav-link>
                     @endif
                     @if (Auth::user()->canViewAuditLog())
@@ -44,7 +49,7 @@
             </div>
 
             <div class="hidden sm:flex sm:items-center sm:ms-6 gap-3">
-                <span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600 capitalize">{{ Auth::user()->role }}</span>
+                <span class="text-xs px-2 py-1 rounded-full bg-brand-soft-100 text-brand-soft-800 capitalize">{{ Auth::user()->role }}</span>
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
@@ -87,6 +92,9 @@
             @endif
             @if (Auth::user()->canBookVehicles())
                 <x-responsive-nav-link :href="route('vehicles.dashboard')" :active="request()->routeIs('vehicles.*')">Pool Vehicle</x-responsive-nav-link>
+            @endif
+            @if (Auth::user()->canViewAnalytics())
+                <x-responsive-nav-link :href="route('admin.analytics.index')" :active="request()->routeIs('admin.analytics.*')">Analytics</x-responsive-nav-link>
             @endif
             @if (Auth::user()->canViewAuditLog())
                 <x-responsive-nav-link :href="route('admin.audit-logs.index')">Audit Log</x-responsive-nav-link>

@@ -20,12 +20,26 @@ class User extends Authenticatable
 
     public const ROLE_SUPER_USER = 'super_user';
 
+    public const DEPARTMENTS = [
+        'HR',
+        'IT & Digital Transformation',
+        'Wealth Solutions',
+        'Finance Dept',
+        'Investments',
+        'Legal & Administration',
+        'Operations Dept',
+    ];
+
     protected $fillable = [
         'name',
         'email',
+        'department',
         'password',
         'role',
         'is_active',
+        'approved_at',
+        'rejected_at',
+        'email_verified_at',
     ];
 
     protected $hidden = [
@@ -37,6 +51,8 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'approved_at' => 'datetime',
+            'rejected_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
         ];
@@ -44,12 +60,50 @@ class User extends Authenticatable
 
     public function scopeActive($query)
     {
-        return $query->where('is_active', true);
+        return $query->where('is_active', true)->whereNotNull('approved_at');
+    }
+
+    public function scopePendingApproval($query)
+    {
+        return $query->whereNull('approved_at')->whereNull('rejected_at');
+    }
+
+    public function scopeApproved($query)
+    {
+        return $query->whereNotNull('approved_at');
     }
 
     public function isActive(): bool
     {
         return (bool) $this->is_active;
+    }
+
+    public function isApproved(): bool
+    {
+        return $this->approved_at !== null;
+    }
+
+    public function isPendingApproval(): bool
+    {
+        return $this->approved_at === null && $this->rejected_at === null;
+    }
+
+    public function isRejected(): bool
+    {
+        return $this->rejected_at !== null;
+    }
+
+    public function accountStatusLabel(): string
+    {
+        if ($this->isRejected()) {
+            return 'Rejected';
+        }
+
+        if ($this->isPendingApproval()) {
+            return 'Pending approval';
+        }
+
+        return $this->isActive() ? 'Active' : 'Deactivated';
     }
 
     public function bookings(): HasMany
@@ -97,6 +151,11 @@ class User extends Authenticatable
     }
 
     public function canAccessAdminDashboard(): bool
+    {
+        return $this->hasPrivilege(Privileges::VIEW_ADMIN_BOOKINGS);
+    }
+
+    public function canViewAnalytics(): bool
     {
         return $this->hasPrivilege(Privileges::VIEW_ADMIN_BOOKINGS);
     }
