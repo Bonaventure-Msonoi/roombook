@@ -1,0 +1,169 @@
+<x-app-layout>
+    <x-slot name="header">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <h2 class="font-semibold text-xl text-gray-800">{{ __('Manage Users') }}</h2>
+            <a href="{{ route('admin.users.create') }}" class="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">Add user</a>
+        </div>
+    </x-slot>
+
+    <div class="py-8">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            @if (session('status'))
+                <div class="mb-4 rounded-md bg-green-50 p-4 text-sm text-green-800">{{ session('status') }}</div>
+            @endif
+            @if (session('error'))
+                <div class="mb-4 rounded-md bg-red-50 p-4 text-sm text-red-800">{{ session('error') }}</div>
+            @endif
+
+            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
+                <div class="md:hidden divide-y divide-gray-100">
+                    @forelse ($users as $user)
+                        <div class="p-4 space-y-3 {{ $user->id === auth()->id() ? 'bg-indigo-50' : (!$user->isActive() ? 'bg-gray-50 opacity-80' : '') }}">
+                            <div>
+                                <p class="font-medium text-gray-900">
+                                    {{ $user->name }}
+                                    @if ($user->id === auth()->id())
+                                        <span class="ml-1 text-xs text-indigo-500">(you)</span>
+                                    @endif
+                                </p>
+                                <p class="text-sm text-gray-600 break-all">{{ $user->email }}</p>
+                                <div class="mt-2 flex flex-wrap items-center gap-2">
+                                    <span class="px-2 py-0.5 rounded-full text-xs font-medium capitalize
+                                        {{ $user->isSuperUser() ? 'bg-purple-100 text-purple-700' : ($user->role === 'admin' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600') }}">
+                                        {{ str_replace('_', ' ', $user->role) }}
+                                    </span>
+                                    <span class="px-2 py-0.5 rounded-full text-xs font-medium {{ $user->isActive() ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
+                                        {{ $user->isActive() ? 'Active' : 'Deactivated' }}
+                                    </span>
+                                    <span class="text-xs text-gray-500">Joined {{ $user->created_at->format('d M Y') }}</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-3 text-sm">
+                                <a href="{{ route('admin.users.edit', $user) }}" class="text-indigo-600 hover:text-indigo-800">Edit</a>
+                                <button type="button"
+                                    onclick="document.getElementById('reset-modal-{{ $user->id }}').classList.remove('hidden')"
+                                    class="text-gray-700 hover:text-gray-900">Reset password</button>
+                                @if ($user->id !== auth()->id())
+                                    @if ($user->isActive())
+                                        <form method="POST" action="{{ route('admin.users.deactivate', $user) }}"
+                                            onsubmit="return confirm('Deactivate {{ $user->name }}? They will no longer be able to sign in.')">
+                                            @csrf @method('PATCH')
+                                            <button type="submit" class="text-red-600 hover:text-red-800">Deactivate</button>
+                                        </form>
+                                    @else
+                                        <form method="POST" action="{{ route('admin.users.reactivate', $user) }}">
+                                            @csrf @method('PATCH')
+                                            <button type="submit" class="text-green-600 hover:text-green-800">Reactivate</button>
+                                        </form>
+                                    @endif
+                                @endif
+                            </div>
+                        </div>
+                    @empty
+                        <div class="p-8 text-center text-gray-500">No users found.</div>
+                    @endforelse
+                </div>
+
+                <div class="hidden md:block overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Joined</th>
+                            <th class="px-4 py-3"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @forelse ($users as $user)
+                            <tr class="{{ $user->id === auth()->id() ? 'bg-indigo-50' : (!$user->isActive() ? 'bg-gray-50 opacity-80' : '') }}">
+                                <td class="px-4 py-3 text-sm font-medium text-gray-900">
+                                    {{ $user->name }}
+                                    @if ($user->id === auth()->id())
+                                        <span class="ml-1 text-xs text-indigo-500">(you)</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-600">{{ $user->email }}</td>
+                                <td class="px-4 py-3 text-sm capitalize">
+                                    <span class="px-2 py-0.5 rounded-full text-xs font-medium
+                                        {{ $user->isSuperUser() ? 'bg-purple-100 text-purple-700' : ($user->role === 'admin' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600') }}">
+                                        {{ str_replace('_', ' ', $user->role) }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-sm">
+                                    <span class="px-2 py-0.5 rounded-full text-xs font-medium {{ $user->isActive() ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
+                                        {{ $user->isActive() ? 'Active' : 'Deactivated' }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-500">{{ $user->created_at->format('d M Y') }}</td>
+                                <td class="px-4 py-3 text-right">
+                                    <div x-data="{ open: false }" class="relative inline-block text-left">
+                                        <button @click="open = !open" class="text-gray-400 hover:text-gray-600 p-1 rounded">
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zm0 8a2 2 0 110-4 2 2 0 010 4zm0-4a2 2 0 110-4 2 2 0 010 4z"/>
+                                            </svg>
+                                        </button>
+                                        <div x-show="open" @click.outside="open = false"
+                                            class="absolute right-0 mt-1 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-10 text-sm"
+                                            style="display:none">
+                                            <a href="{{ route('admin.users.edit', $user) }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-50">Edit details</a>
+                                            <button onclick="document.getElementById('reset-modal-{{ $user->id }}').classList.remove('hidden')"
+                                                class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50">Reset password</button>
+                                            @if ($user->id !== auth()->id())
+                                                @if ($user->isActive())
+                                                    <form method="POST" action="{{ route('admin.users.deactivate', $user) }}"
+                                                        onsubmit="return confirm('Deactivate {{ $user->name }}? They will no longer be able to sign in.')">
+                                                        @csrf @method('PATCH')
+                                                        <button type="submit" class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50">Deactivate</button>
+                                                    </form>
+                                                @else
+                                                    <form method="POST" action="{{ route('admin.users.reactivate', $user) }}">
+                                                        @csrf @method('PATCH')
+                                                        <button type="submit" class="w-full text-left px-4 py-2 text-green-600 hover:bg-green-50">Reactivate</button>
+                                                    </form>
+                                                @endif
+                                            @endif
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            {{-- Reset-password modal --}}
+                            <div id="reset-modal-{{ $user->id }}" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                                <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+                                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Reset password — {{ $user->name }}</h3>
+                                    <form method="POST" action="{{ route('admin.users.reset-password', $user) }}" class="space-y-4">
+                                        @csrf @method('PATCH')
+                                        <div>
+                                            <x-input-label for="password_{{ $user->id }}" value="New password" />
+                                            <x-text-input id="password_{{ $user->id }}" name="password" type="password" class="mt-1 block w-full" required autocomplete="new-password" />
+                                        </div>
+                                        <div>
+                                            <x-input-label for="password_confirmation_{{ $user->id }}" value="Confirm password" />
+                                            <x-text-input id="password_confirmation_{{ $user->id }}" name="password_confirmation" type="password" class="mt-1 block w-full" required autocomplete="new-password" />
+                                        </div>
+                                        <div class="flex gap-3 pt-1">
+                                            <x-primary-button>Set password</x-primary-button>
+                                            <button type="button"
+                                                onclick="document.getElementById('reset-modal-{{ $user->id }}').classList.add('hidden')"
+                                                class="text-sm text-gray-600 hover:text-gray-900">Cancel</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="px-4 py-8 text-center text-gray-500">No users found.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</x-app-layout>

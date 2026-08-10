@@ -16,18 +16,31 @@ class StoreVehicleBookingRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
+        $rules = [
             'vehicle_id' => ['required', 'exists:vehicles,id'],
             'title' => ['required', 'string', 'max:255'],
             'starts_at' => ['required', 'date', 'after:now', 'before:'.now()->addMonths(6)->endOfDay()->toDateTimeString()],
             'ends_at' => ['required', 'date', 'after:starts_at', 'before:'.now()->addMonths(6)->endOfDay()->toDateTimeString()],
+            'reason' => ['nullable', 'string', 'max:500'],
         ];
+
+        if ($this->user()?->canBookOnBehalf()) {
+            $rules['user_id'] = ['nullable', 'exists:users,id'];
+        }
+
+        return $rules;
     }
 
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $validator) {
             if ($validator->errors()->isNotEmpty()) {
+                return;
+            }
+
+            if ($this->filled('user_id') && ! $this->user()?->canBookOnBehalf()) {
+                $validator->errors()->add('user_id', 'You cannot book on behalf of another user.');
+
                 return;
             }
 
@@ -38,5 +51,14 @@ class StoreVehicleBookingRequest extends FormRequest
                 $validator->errors()->add('starts_at', 'This vehicle is already booked for the selected time.');
             }
         });
+    }
+
+    public function bookingOwnerId(): int
+    {
+        if ($this->user()?->canBookOnBehalf() && $this->filled('user_id')) {
+            return (int) $this->input('user_id');
+        }
+
+        return (int) $this->user()->id;
     }
 }

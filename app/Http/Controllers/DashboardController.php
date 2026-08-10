@@ -32,7 +32,7 @@ class DashboardController extends Controller
                 'extendedProps' => [
                     'bookedBy' => $booking->user->name,
                     'room' => $booking->room->name,
-                    'canCancel' => $booking->user_id === auth()->id() || auth()->user()->isAdmin(),
+                    'canCancel' => $booking->user_id === auth()->id() || auth()->user()->canCancelAnyBooking(),
                 ],
             ]);
 

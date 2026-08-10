@@ -16,12 +16,19 @@ class StoreBookingRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
+        $rules = [
             'room_id' => ['required', 'exists:rooms,id'],
             'title' => ['required', 'string', 'max:255'],
             'starts_at' => ['required', 'date', 'after:now', 'before:'.now()->addMonths(6)->endOfDay()->toDateTimeString()],
             'ends_at' => ['required', 'date', 'after:starts_at', 'before:'.now()->addMonths(6)->endOfDay()->toDateTimeString()],
+            'reason' => ['nullable', 'string', 'max:500'],
         ];
+
+        if ($this->user()?->canBookOnBehalf()) {
+            $rules['user_id'] = ['nullable', 'exists:users,id'];
+        }
+
+        return $rules;
     }
 
     public function messages(): array
@@ -41,6 +48,12 @@ class StoreBookingRequest extends FormRequest
                 return;
             }
 
+            if ($this->filled('user_id') && ! $this->user()?->canBookOnBehalf()) {
+                $validator->errors()->add('user_id', 'You cannot book on behalf of another user.');
+
+                return;
+            }
+
             $startsAt = Carbon::parse($this->input('starts_at'));
             $endsAt = Carbon::parse($this->input('ends_at'));
 
@@ -48,5 +61,14 @@ class StoreBookingRequest extends FormRequest
                 $validator->errors()->add('starts_at', 'This room is already booked for the selected time.');
             }
         });
+    }
+
+    public function bookingOwnerId(): int
+    {
+        if ($this->user()?->canBookOnBehalf() && $this->filled('user_id')) {
+            return (int) $this->input('user_id');
+        }
+
+        return (int) $this->user()->id;
     }
 }

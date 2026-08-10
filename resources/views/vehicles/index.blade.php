@@ -10,11 +10,11 @@
     </x-slot>
 
     <div class="py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             @if ($vehicles->isEmpty())
                 <div class="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
                     No vehicles in the pool yet.
-                    @if (Auth::user()->isSuperUser())
+                    @if (Auth::user()->canManageVehicles())
                         <a href="{{ route('admin.vehicles.create') }}" class="text-indigo-600 hover:text-indigo-800 block mt-2">Add a vehicle</a>
                     @endif
                 </div>

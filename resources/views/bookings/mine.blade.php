@@ -6,7 +6,7 @@
     </x-slot>
 
     <div class="py-8">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             @if (session('status'))
                 <div class="mb-4 rounded-md bg-green-50 p-4 text-sm text-green-800">
                     {{ session('status') }}
@@ -22,7 +22,7 @@
                 @else
                     <div class="divide-y divide-gray-200">
                         @foreach ($bookings as $booking)
-                            <div class="p-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div class="p-4 sm:p-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                                 <div>
                                     <p class="font-semibold text-gray-900">{{ $booking->title }}</p>
                                     <p class="text-sm text-gray-600">{{ $booking->room->name }}</p>
@@ -32,12 +32,16 @@
                                     </p>
                                 </div>
                                 @if ($booking->ends_at->isFuture())
-                                    <form method="POST" action="{{ route('boardroom.bookings.destroy', $booking) }}"
-                                          onsubmit="return confirm('Cancel this booking?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <x-danger-button type="submit">Cancel</x-danger-button>
-                                    </form>
+                                    <div class="flex items-center gap-3">
+                                        <a href="{{ route('boardroom.bookings.edit', $booking) }}"
+                                           class="text-sm text-indigo-600 hover:text-indigo-800">Edit</a>
+                                        <form method="POST" action="{{ route('boardroom.bookings.destroy', $booking) }}"
+                                              onsubmit="return confirm('Cancel this booking?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <x-danger-button type="submit">Cancel</x-danger-button>
+                                        </form>
+                                    </div>
                                 @endif
                             </div>
                         @endforeach

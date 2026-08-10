@@ -13,7 +13,7 @@
     </x-slot>
 
     <div class="py-8">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <div class="bg-white rounded-lg shadow-sm p-6 grid gap-2 sm:grid-cols-2 text-sm">
                 <p><span class="font-medium">Plate:</span> {{ $vehicle->number_plate }}</p>
                 <p><span class="font-medium">Chassis:</span> {{ $vehicle->chassis_number }}</p>

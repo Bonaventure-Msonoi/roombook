@@ -9,7 +9,7 @@
     </x-slot>
 
     <div class="py-8" x-data="roomCalendar()">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             @if (session('status'))
                 <div class="rounded-md bg-green-50 p-4 text-sm text-green-800">
                     {{ session('status') }}
@@ -26,9 +26,9 @@
                 </div>
             @endif
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+            <div class="bg-white overflow-x-auto shadow-sm sm:rounded-lg p-4 sm:p-6">
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
-                    <div class="flex flex-wrap gap-4">
+                    <div class="flex flex-wrap gap-3 sm:gap-4">
                         @foreach ($rooms as $room)
                             <div class="flex items-center gap-2 text-sm text-gray-700">
                                 <span class="inline-block w-3 h-3 rounded-full" style="background-color: {{ $room->color }}"></span>
@@ -49,17 +49,17 @@
                                    class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm">
                         </div>
 
-                        <div class="inline-flex rounded-lg border border-gray-200 p-1 bg-gray-50">
+                        <div class="inline-flex w-full sm:w-auto rounded-lg border border-gray-200 p-1 bg-gray-50">
                             <button type="button"
                                     @click="setView('week')"
                                     :class="activeView === 'week' ? 'bg-white shadow text-indigo-700' : 'text-gray-600 hover:text-gray-900'"
-                                    class="px-3 py-1.5 text-sm font-medium rounded-md transition">
+                                    class="flex-1 sm:flex-none px-3 py-1.5 text-sm font-medium rounded-md transition">
                                 Week overview
                             </button>
                             <button type="button"
                                     @click="setView('rooms')"
                                     :class="activeView === 'rooms' ? 'bg-white shadow text-indigo-700' : 'text-gray-600 hover:text-gray-900'"
-                                    class="px-3 py-1.5 text-sm font-medium rounded-md transition">
+                                    class="flex-1 sm:flex-none px-3 py-1.5 text-sm font-medium rounded-md transition">
                                 Book by room
                             </button>
                         </div>
@@ -67,14 +67,16 @@
                 </div>
 
                 <div x-show="activeView === 'week'" x-cloak>
-                    <div id="week-calendar"></div>
+                    <div class="calendar-scroll -mx-4 px-4 sm:mx-0 sm:px-0">
+                        <div id="week-calendar" class="min-w-[320px]"></div>
+                    </div>
                 </div>
 
                 <div x-show="activeView === 'rooms'" x-cloak>
-                    <div class="flex items-center justify-between mb-4">
-                        <button type="button" @click="shiftRoomDay(-1)" class="px-3 py-1 text-sm border rounded-md text-gray-600 hover:bg-gray-50">Previous day</button>
-                        <p class="text-sm font-medium text-gray-800" x-text="roomDayLabel"></p>
-                        <button type="button" @click="shiftRoomDay(1)" class="px-3 py-1 text-sm border rounded-md text-gray-600 hover:bg-gray-50">Next day</button>
+                    <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
+                        <button type="button" @click="shiftRoomDay(-1)" class="px-3 py-1.5 text-sm border rounded-md text-gray-600 hover:bg-gray-50">Previous day</button>
+                        <p class="text-sm font-medium text-gray-800 text-center" x-text="roomDayLabel"></p>
+                        <button type="button" @click="shiftRoomDay(1)" class="px-3 py-1.5 text-sm border rounded-md text-gray-600 hover:bg-gray-50">Next day</button>
                     </div>
                     <div class="grid gap-4 lg:grid-cols-3">
                         @foreach ($rooms as $room)
@@ -159,10 +161,20 @@
         <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
         <style>
             [x-cloak] { display: none !important; }
-            #week-calendar, .room-day-calendar { min-height: 650px; }
-            .room-day-calendar { min-height: 520px; }
+            .calendar-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            #week-calendar, .room-day-calendar { min-height: 420px; }
+            .room-day-calendar { min-height: 380px; }
+            @media (min-width: 640px) {
+                #week-calendar, .room-day-calendar { min-height: 650px; }
+                .room-day-calendar { min-height: 520px; }
+            }
             .fc-event { cursor: pointer; }
             .fc .fc-highlight { background: rgba(99, 102, 241, 0.2); }
+            @media (max-width: 639px) {
+                .fc .fc-toolbar { flex-wrap: wrap; gap: 0.5rem; }
+                .fc .fc-toolbar-title { font-size: 1rem; }
+                .fc .fc-button { padding: 0.25rem 0.5rem; font-size: 0.75rem; }
+            }
         </style>
     @endpush
 
@@ -309,6 +321,26 @@
                         }
                     },
 
+                    isMobile() {
+                        return window.innerWidth < 768;
+                    },
+
+                    weekCalendarToolbar() {
+                        if (this.isMobile()) {
+                            return {
+                                left: 'prev,next',
+                                center: 'title',
+                                right: 'timeGridDay,dayGridMonth',
+                            };
+                        }
+
+                        return {
+                            left: 'prev,next today',
+                            center: 'title',
+                            right: 'dayGridMonth,timeGridWeek,timeGridDay',
+                        };
+                    },
+
                     sharedCalendarOptions(extra = {}) {
                         return {
                             slotMinTime: '07:00:00',
@@ -335,12 +367,8 @@
                     initWeekCalendar() {
                         const el = document.getElementById('week-calendar');
                         this.weekCalendar = new FullCalendar.Calendar(el, this.sharedCalendarOptions({
-                            initialView: 'timeGridWeek',
-                            headerToolbar: {
-                                left: 'prev,next today',
-                                center: 'title',
-                                right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                            },
+                            initialView: this.isMobile() ? 'timeGridDay' : 'timeGridWeek',
+                            headerToolbar: this.weekCalendarToolbar(),
                             events: '{{ route('boardroom.calendar.events') }}',
                             dateClick: (info) => {
                                 if (info.view.type === 'dayGridMonth') {

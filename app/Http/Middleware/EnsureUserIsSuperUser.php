@@ -10,7 +10,7 @@ class EnsureUserIsSuperUser
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->user()?->canManageVehicles()) {
+        if (! $request->user()?->canManageRolePrivileges()) {
             abort(403, 'Super user access required.');
         }
 

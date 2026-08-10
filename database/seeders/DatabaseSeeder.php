@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
                 'password' => 'password',
                 'role' => User::ROLE_SUPER_USER,
                 'email_verified_at' => now(),
+                'is_active' => true,
             ]
         );
 
@@ -29,6 +30,7 @@ class DatabaseSeeder extends Seeder
                 'password' => 'password',
                 'role' => User::ROLE_ADMIN,
                 'email_verified_at' => now(),
+                'is_active' => true,
             ]
         );
 
@@ -39,6 +41,7 @@ class DatabaseSeeder extends Seeder
                 'password' => 'password',
                 'role' => User::ROLE_USER,
                 'email_verified_at' => now(),
+                'is_active' => true,
             ]
         );
 

@@ -9,7 +9,7 @@
     </x-slot>
 
     <div class="py-8" x-data="roomCalendar()">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             @if (session('status'))
                 <div class="rounded-md bg-green-50 p-4 text-sm text-green-800">
                     {{ session('status') }}

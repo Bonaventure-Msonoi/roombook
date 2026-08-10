@@ -1,46 +1,72 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h2 class="font-semibold text-xl text-gray-800">{{ __('Manage Vehicles') }}</h2>
-            <a href="{{ route('admin.vehicles.create') }}" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">Add vehicle</a>
+            <a href="{{ route('admin.vehicles.create') }}" class="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">Add vehicle</a>
         </div>
     </x-slot>
     <div class="py-8">
-        <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             @if (session('status'))<div class="mb-4 rounded-md bg-green-50 p-4 text-sm text-green-800">{{ session('status') }}</div>@endif
-            <div class="bg-white shadow-sm sm:rounded-lg overflow-x-auto">
-                <table class="min-w-full divide-y">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Plate</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Make</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Year</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                            <th class="px-4 py-3"></th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y">
-                        @forelse ($vehicles as $vehicle)
+            <div class="bg-white shadow-sm sm:rounded-lg overflow-hidden">
+                <div class="md:hidden divide-y divide-gray-100">
+                    @forelse ($vehicles as $vehicle)
+                        <div class="p-4 space-y-3">
+                            <div>
+                                <p class="font-medium text-gray-900">{{ $vehicle->number_plate }}</p>
+                                <p class="text-sm text-gray-600">{{ $vehicle->make }}</p>
+                                <p class="text-sm text-gray-500">{{ $vehicle->category }} · {{ $vehicle->year_of_make }}</p>
+                                <p class="text-sm mt-1 {{ $vehicle->is_active ? 'text-green-700' : 'text-gray-500' }}">
+                                    {{ $vehicle->is_active ? 'Active' : 'Inactive' }}
+                                </p>
+                            </div>
+                            <div class="flex gap-4 text-sm">
+                                <a href="{{ route('admin.vehicles.edit', $vehicle) }}" class="text-indigo-600">Edit</a>
+                                <form method="POST" action="{{ route('admin.vehicles.destroy', $vehicle) }}" onsubmit="return confirm('Delete this vehicle?')">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="text-red-600">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="p-8 text-center text-gray-500">No vehicles yet.</div>
+                    @endforelse
+                </div>
+
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="min-w-full divide-y">
+                        <thead class="bg-gray-50">
                             <tr>
-                                <td class="px-4 py-3 text-sm font-medium">{{ $vehicle->number_plate }}</td>
-                                <td class="px-4 py-3 text-sm">{{ $vehicle->make }}</td>
-                                <td class="px-4 py-3 text-sm">{{ $vehicle->category }}</td>
-                                <td class="px-4 py-3 text-sm">{{ $vehicle->year_of_make }}</td>
-                                <td class="px-4 py-3 text-sm">{{ $vehicle->is_active ? 'Active' : 'Inactive' }}</td>
-                                <td class="px-4 py-3 text-right space-x-2">
-                                    <a href="{{ route('admin.vehicles.edit', $vehicle) }}" class="text-indigo-600 text-sm">Edit</a>
-                                    <form method="POST" action="{{ route('admin.vehicles.destroy', $vehicle) }}" class="inline" onsubmit="return confirm('Delete this vehicle?')">
-                                        @csrf @method('DELETE')
-                                        <button type="submit" class="text-red-600 text-sm">Delete</button>
-                                    </form>
-                                </td>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Plate</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Make</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Year</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                <th class="px-4 py-3"></th>
                             </tr>
-                        @empty
-                            <tr><td colspan="6" class="px-4 py-8 text-center text-gray-500">No vehicles yet.</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody class="divide-y">
+                            @forelse ($vehicles as $vehicle)
+                                <tr>
+                                    <td class="px-4 py-3 text-sm font-medium">{{ $vehicle->number_plate }}</td>
+                                    <td class="px-4 py-3 text-sm">{{ $vehicle->make }}</td>
+                                    <td class="px-4 py-3 text-sm">{{ $vehicle->category }}</td>
+                                    <td class="px-4 py-3 text-sm">{{ $vehicle->year_of_make }}</td>
+                                    <td class="px-4 py-3 text-sm">{{ $vehicle->is_active ? 'Active' : 'Inactive' }}</td>
+                                    <td class="px-4 py-3 text-right space-x-2">
+                                        <a href="{{ route('admin.vehicles.edit', $vehicle) }}" class="text-indigo-600 text-sm">Edit</a>
+                                        <form method="POST" action="{{ route('admin.vehicles.destroy', $vehicle) }}" class="inline" onsubmit="return confirm('Delete this vehicle?')">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" class="text-red-600 text-sm">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="6" class="px-4 py-8 text-center text-gray-500">No vehicles yet.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

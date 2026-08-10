@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Privileges;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -24,6 +25,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'is_active',
     ];
 
     protected $hidden = [
@@ -36,7 +38,18 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    public function isActive(): bool
+    {
+        return (bool) $this->is_active;
     }
 
     public function bookings(): HasMany
@@ -64,18 +77,62 @@ class User extends Authenticatable
         return $this->role === self::ROLE_SUPER_USER;
     }
 
+    public function hasPrivilege(string $privilege): bool
+    {
+        if ($this->isSuperUser()) {
+            return true;
+        }
+
+        return RolePrivilege::roleHas($this->role, $privilege);
+    }
+
+    public function canBookBoardroom(): bool
+    {
+        return $this->hasPrivilege(Privileges::BOOK_BOARDROOM);
+    }
+
+    public function canBookVehicles(): bool
+    {
+        return $this->hasPrivilege(Privileges::BOOK_VEHICLES);
+    }
+
     public function canAccessAdminDashboard(): bool
     {
-        return $this->isAdmin();
+        return $this->hasPrivilege(Privileges::VIEW_ADMIN_BOOKINGS);
     }
 
     public function canManageVehicles(): bool
+    {
+        return $this->hasPrivilege(Privileges::MANAGE_VEHICLES);
+    }
+
+    public function canManageUsers(): bool
+    {
+        return $this->hasPrivilege(Privileges::MANAGE_USERS);
+    }
+
+    public function canManageRolePrivileges(): bool
     {
         return $this->isSuperUser();
     }
 
     public function canCancelAnyBooking(): bool
     {
-        return $this->isAdmin();
+        return $this->hasPrivilege(Privileges::CANCEL_ANY_BOOKING);
+    }
+
+    public function canManageAnyBooking(): bool
+    {
+        return $this->hasPrivilege(Privileges::MANAGE_ANY_BOOKING);
+    }
+
+    public function canBookOnBehalf(): bool
+    {
+        return $this->hasPrivilege(Privileges::BOOK_ON_BEHALF);
+    }
+
+    public function canViewAuditLog(): bool
+    {
+        return $this->hasPrivilege(Privileges::VIEW_AUDIT_LOG);
     }
 }

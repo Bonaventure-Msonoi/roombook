@@ -3,24 +3,41 @@
         <div class="flex justify-between h-16">
             <div class="flex">
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('home') }}" class="text-lg font-bold text-indigo-600">
-                        {{ config('app.name', 'RoomBook') }}
-                    </a>
+                    <x-app-logo size="md" />
                 </div>
 
                 <div class="hidden space-x-6 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('home')" :active="request()->routeIs('home')">
                         {{ __('Home') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('boardroom.dashboard')" :active="request()->routeIs('boardroom.*')">
-                        {{ __('Boardroom') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('vehicles.dashboard')" :active="request()->routeIs('vehicles.*')">
-                        {{ __('Pool Vehicle') }}
-                    </x-nav-link>
-                    @if (Auth::user()->isSuperUser())
+                    @if (Auth::user()->canBookBoardroom())
+                        <x-nav-link :href="route('boardroom.dashboard')" :active="request()->routeIs('boardroom.*')">
+                            {{ __('Boardroom') }}
+                        </x-nav-link>
+                    @endif
+                    @if (Auth::user()->canBookVehicles())
+                        <x-nav-link :href="route('vehicles.dashboard')" :active="request()->routeIs('vehicles.*')">
+                            {{ __('Pool Vehicle') }}
+                        </x-nav-link>
+                    @endif
+                    @if (Auth::user()->canViewAuditLog())
+                        <x-nav-link :href="route('admin.audit-logs.index')" :active="request()->routeIs('admin.audit-logs.*')">
+                            {{ __('Audit Log') }}
+                        </x-nav-link>
+                    @endif
+                    @if (Auth::user()->canManageVehicles())
                         <x-nav-link :href="route('admin.vehicles.index')" :active="request()->routeIs('admin.vehicles.*')">
                             {{ __('Manage Vehicles') }}
+                        </x-nav-link>
+                    @endif
+                    @if (Auth::user()->canManageUsers())
+                        <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                            {{ __('Manage Users') }}
+                        </x-nav-link>
+                    @endif
+                    @if (Auth::user()->canManageRolePrivileges())
+                        <x-nav-link :href="route('admin.role-privileges.edit')" :active="request()->routeIs('admin.role-privileges.*')">
+                            {{ __('Role Privileges') }}
                         </x-nav-link>
                     @endif
                 </div>
@@ -65,11 +82,38 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')">Home</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('boardroom.dashboard')" :active="request()->routeIs('boardroom.*')">Boardroom</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('vehicles.dashboard')" :active="request()->routeIs('vehicles.*')">Pool Vehicle</x-responsive-nav-link>
-            @if (Auth::user()->isSuperUser())
+            @if (Auth::user()->canBookBoardroom())
+                <x-responsive-nav-link :href="route('boardroom.dashboard')" :active="request()->routeIs('boardroom.*')">Boardroom</x-responsive-nav-link>
+            @endif
+            @if (Auth::user()->canBookVehicles())
+                <x-responsive-nav-link :href="route('vehicles.dashboard')" :active="request()->routeIs('vehicles.*')">Pool Vehicle</x-responsive-nav-link>
+            @endif
+            @if (Auth::user()->canViewAuditLog())
+                <x-responsive-nav-link :href="route('admin.audit-logs.index')">Audit Log</x-responsive-nav-link>
+            @endif
+            @if (Auth::user()->canManageVehicles())
                 <x-responsive-nav-link :href="route('admin.vehicles.index')">Manage Vehicles</x-responsive-nav-link>
             @endif
+            @if (Auth::user()->canManageUsers())
+                <x-responsive-nav-link :href="route('admin.users.index')">Manage Users</x-responsive-nav-link>
+            @endif
+            @if (Auth::user()->canManageRolePrivileges())
+                <x-responsive-nav-link :href="route('admin.role-privileges.edit')">Role Privileges</x-responsive-nav-link>
+            @endif
+        </div>
+
+        <div class="pt-4 pb-4 border-t border-gray-200">
+            <div class="px-4 mb-3">
+                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
+                <div class="text-sm text-gray-500 capitalize">{{ str_replace('_', ' ', Auth::user()->role) }}</div>
+            </div>
+            <x-responsive-nav-link :href="route('profile.edit')">{{ __('Profile') }}</x-responsive-nav-link>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <x-responsive-nav-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
+                    {{ __('Log Out') }}
+                </x-responsive-nav-link>
+            </form>
         </div>
     </div>
 </nav>
