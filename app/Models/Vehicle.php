@@ -20,10 +20,8 @@ class Vehicle extends Model
 
     protected $fillable = [
         'number_plate',
-        'chassis_number',
         'engine_capacity',
         'make',
-        'year_of_make',
         'category',
         'color',
         'is_active',
@@ -32,7 +30,6 @@ class Vehicle extends Model
     protected function casts(): array
     {
         return [
-            'year_of_make' => 'integer',
             'is_active' => 'boolean',
         ];
     }

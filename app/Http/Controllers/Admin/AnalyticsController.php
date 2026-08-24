@@ -34,18 +34,18 @@ class AnalyticsController extends Controller
         $data = $this->analyticsPayload($from, $to, forDisplay: false);
         $workbook = $this->buildWorkbook($data);
         $filename = sprintf(
-            'reservio-analytics-%s-to-%s.xls',
+            'reservio-vehicle-usage-%s-to-%s.xlsx',
             $from->format('Y-m-d_Hi'),
             $to->format('Y-m-d_Hi')
         );
 
         return response()->streamDownload(
             function () use ($workbook) {
-                echo $workbook->toXml();
+                echo $workbook->toXlsx();
             },
             $filename,
             [
-                'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             ]
         );
     }
@@ -57,7 +57,7 @@ class AnalyticsController extends Controller
     {
         $defaults = [
             'from' => now()->startOfMonth()->format('Y-m-d\TH:i'),
-            'to' => now()->endOfDay()->format('Y-m-d\TH:i'),
+            'to' => now()->endOfMonth()->format('Y-m-d\TH:i'),
         ];
 
         $validated = $request->validate([
@@ -68,8 +68,8 @@ class AnalyticsController extends Controller
         $fromInput = $validated['from'] ?? $defaults['from'];
         $toInput = $validated['to'] ?? $defaults['to'];
 
-        $from = Carbon::parse($fromInput);
-        $to = Carbon::parse($toInput);
+        $from = Carbon::parse($fromInput)->startOfMinute();
+        $to = Carbon::parse($toInput)->endOfMinute();
 
         if ($to->lt($from)) {
             throw ValidationException::withMessages([
@@ -184,9 +184,7 @@ class AnalyticsController extends Controller
             ->get();
 
         $periodVehicleBookings = VehicleBooking::with(['vehicle', 'user'])
-            ->confirmed()
-            ->where('starts_at', '<', $to)
-            ->where('ends_at', '>', $from)
+            ->whereBetween('starts_at', [$from, $to])
             ->orderBy('starts_at')
             ->get();
 
@@ -234,128 +232,41 @@ class AnalyticsController extends Controller
      */
     private function buildWorkbook(array $data): ExcelWorkbook
     {
-        $stats = $data['stats'];
-
         $workbook = new ExcelWorkbook;
 
-        $workbook->addSheet('Summary', [
-            ['Metric', 'Value'],
+        $usageRows = $data['periodVehicleBookings']->map(fn (VehicleBooking $booking) => [
+            $booking->user?->name ?? '',
+            $booking->user?->department ?? 'Unassigned',
+            $booking->title ?? '',
+            $booking->vehicle?->displayName() ?? '',
+            $booking->destination ?? '',
+            $booking->starts_at?->format('Y-m-d H:i') ?? '',
+            $booking->ends_at?->format('Y-m-d H:i') ?? '',
+            $booking->status ?? '',
+        ])->all();
+
+        $workbook->addSheet('Vehicle Usage', array_merge(
+            [[
+                'User name',
+                'Department',
+                'Trip purpose',
+                'Vehicle used',
+                'Destination',
+                'Starts at',
+                'Ends at',
+                'Status',
+            ]],
+            $usageRows ?: [['No vehicle usage in this period', '', '', '', '', '', '', '']]
+        ));
+
+        $workbook->addSheet('Export Info', [
+            ['Field', 'Value'],
             ['Period start', $data['from']->toDateTimeString()],
             ['Period end', $data['to']->toDateTimeString()],
             ['Period label', $data['periodLabel']],
             ['Generated at', $data['generatedAt']],
-            ['Boardroom bookings in period', $stats['boardroom_period']],
-            ['Boardroom bookings today', $stats['boardroom_today']],
-            ['Boardroom bookings this week', $stats['boardroom_week']],
-            ['Boardroom cancellations in period', $stats['boardroom_cancelled_period']],
-            ['Boardroom utilization %', $stats['boardroom_utilization']],
-            ['Vehicle bookings in period', $stats['vehicle_period']],
-            ['Vehicle bookings today', $stats['vehicle_today']],
-            ['Vehicle bookings this week', $stats['vehicle_week']],
-            ['Vehicle cancellations in period', $stats['vehicle_cancelled_period']],
-            ['Vehicle utilization %', $stats['vehicle_utilization']],
-            ['Pending signups', $data['pendingCount']],
-            ['Active users', $stats['active_users']],
-            ['Rooms', $stats['room_count']],
-            ['Active vehicles', $stats['active_vehicle_count']],
+            ['Trips in period', count($usageRows)],
         ]);
-
-        $workbook->addSheet('By Department', array_merge(
-            [['Department', 'Bookings in period']],
-            $data['bookingsByDepartment']->map(fn ($row) => [$row['department'], $row['count']])->all()
-                ?: [['No bookings in period', 0]]
-        ));
-
-        $workbook->addSheet('Top Rooms', array_merge(
-            [['Room', 'Bookings in period']],
-            $data['topRooms']->map(fn ($row) => [$row['label'], $row['count']])->all()
-                ?: [['No room bookings in period', 0]]
-        ));
-
-        $workbook->addSheet('Top Vehicles', array_merge(
-            [['Vehicle', 'Bookings in period']],
-            $data['topVehicles']->map(fn ($row) => [$row['label'], $row['count']])->all()
-                ?: [['No vehicle bookings in period', 0]]
-        ));
-
-        $workbook->addSheet('Peak Days', array_merge(
-            [['Day', 'Bookings in period']],
-            $data['peakDays']->map(fn ($row) => [$row['day'], $row['count']])->all()
-        ));
-
-        $workbook->addSheet('Pending Signups', array_merge(
-            [['Name', 'Email', 'Department', 'Signed up']],
-            $data['pendingApprovals']->map(fn (User $user) => [
-                $user->name,
-                $user->email,
-                $user->department ?? '',
-                $user->created_at?->toDateTimeString(),
-            ])->all()
-                ?: [['No pending signups', '', '', '']]
-        ));
-
-        $workbook->addSheet('Boardroom Bookings', array_merge(
-            [['Title', 'Room', 'Booked by', 'Department', 'Starts at', 'Ends at', 'Status']],
-            $data['periodBoardroomBookings']->map(fn (Booking $booking) => [
-                $booking->title,
-                $booking->room?->name ?? '',
-                $booking->user?->name ?? '',
-                $booking->user?->department ?? '',
-                $booking->starts_at?->toDateTimeString(),
-                $booking->ends_at?->toDateTimeString(),
-                $booking->status,
-            ])->all()
-                ?: [['No boardroom bookings in period', '', '', '', '', '', '']]
-        ));
-
-        $workbook->addSheet('Vehicle Bookings', array_merge(
-            [['Title', 'Vehicle', 'Destination', 'Booked by', 'Department', 'Starts at', 'Ends at', 'Status']],
-            $data['periodVehicleBookings']->map(fn (VehicleBooking $booking) => [
-                $booking->title,
-                $booking->vehicle?->displayName() ?? '',
-                $booking->destination ?? '',
-                $booking->user?->name ?? '',
-                $booking->user?->department ?? '',
-                $booking->starts_at?->toDateTimeString(),
-                $booking->ends_at?->toDateTimeString(),
-                $booking->status,
-            ])->all()
-                ?: [['No vehicle bookings in period', '', '', '', '', '', '', '']]
-        ));
-
-        $workbook->addSheet('Upcoming 7 Days', array_merge(
-            [['Type', 'Title', 'Resource', 'Booked by', 'Starts at']],
-            collect()
-                ->concat($data['upcomingBoardroom']->map(fn (Booking $booking) => [
-                    'Boardroom',
-                    $booking->title,
-                    $booking->room?->name ?? '',
-                    $booking->user?->name ?? '',
-                    $booking->starts_at?->toDateTimeString(),
-                ]))
-                ->concat($data['upcomingVehicles']->map(fn (VehicleBooking $booking) => [
-                    'Vehicle',
-                    $booking->title,
-                    $booking->vehicle?->displayName() ?? '',
-                    $booking->user?->name ?? '',
-                    $booking->starts_at?->toDateTimeString(),
-                ]))
-                ->sortBy(fn (array $row) => $row[4] ?? '')
-                ->values()
-                ->all()
-                ?: [['Nothing upcoming', '', '', '', '']]
-        ));
-
-        $workbook->addSheet('Actions in Period', array_merge(
-            [['When', 'Action', 'Description', 'Actor']],
-            $data['recentAudit']->map(fn (AuditLog $log) => [
-                $log->created_at?->toDateTimeString(),
-                $log->action,
-                $log->description,
-                $log->user?->name ?? 'System',
-            ])->all()
-                ?: [['No actions in period', '', '', '']]
-        ));
 
         return $workbook;
     }

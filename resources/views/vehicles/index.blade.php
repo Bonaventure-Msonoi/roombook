@@ -26,7 +26,7 @@
                             <div class="p-6">
                                 <h3 class="text-lg font-semibold text-gray-900">{{ $vehicle->make }}</h3>
                                 <p class="text-sm text-gray-500">{{ $vehicle->number_plate }}</p>
-                                <p class="mt-2 text-sm text-gray-600">{{ $vehicle->category }} · {{ $vehicle->year_of_make }} · {{ $vehicle->engine_capacity }}</p>
+                                <p class="mt-2 text-sm text-gray-600">{{ $vehicle->category }} · {{ $vehicle->engine_capacity }}</p>
                                 <p class="mt-2 text-sm text-gray-500">{{ $vehicle->upcoming_bookings_count }} upcoming booking(s)</p>
                                 <div class="mt-6 flex gap-3">
                                     <a href="{{ route('vehicles.show', $vehicle) }}" class="text-sm font-medium text-emerald-600 hover:text-emerald-800">View schedule</a>

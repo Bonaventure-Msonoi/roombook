@@ -11,10 +11,10 @@ return new class extends Migration
         Schema::create('vehicles', function (Blueprint $table) {
             $table->id();
             $table->string('number_plate')->unique();
-            $table->string('chassis_number')->unique();
+            $table->string('chassis_number')->nullable()->unique();
             $table->string('engine_capacity');
             $table->string('make');
-            $table->unsignedSmallInteger('year_of_make');
+            $table->unsignedSmallInteger('year_of_make')->nullable();
             $table->string('category');
             $table->string('color', 7)->default('#6366f1');
             $table->boolean('is_active')->default(true);

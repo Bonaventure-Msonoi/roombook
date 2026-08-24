@@ -15,7 +15,7 @@
                             <div>
                                 <p class="font-medium text-gray-900">{{ $vehicle->number_plate }}</p>
                                 <p class="text-sm text-gray-600">{{ $vehicle->make }}</p>
-                                <p class="text-sm text-gray-500">{{ $vehicle->category }} · {{ $vehicle->year_of_make }}</p>
+                                <p class="text-sm text-gray-500">{{ $vehicle->category }}</p>
                                 <p class="text-sm mt-1 {{ $vehicle->is_active ? 'text-green-700' : 'text-gray-500' }}">
                                     {{ $vehicle->is_active ? 'Active' : 'Inactive' }}
                                 </p>
@@ -40,7 +40,6 @@
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Plate</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Make</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Year</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                                 <th class="px-4 py-3"></th>
                             </tr>
@@ -51,7 +50,6 @@
                                     <td class="px-4 py-3 text-sm font-medium">{{ $vehicle->number_plate }}</td>
                                     <td class="px-4 py-3 text-sm">{{ $vehicle->make }}</td>
                                     <td class="px-4 py-3 text-sm">{{ $vehicle->category }}</td>
-                                    <td class="px-4 py-3 text-sm">{{ $vehicle->year_of_make }}</td>
                                     <td class="px-4 py-3 text-sm">{{ $vehicle->is_active ? 'Active' : 'Inactive' }}</td>
                                     <td class="px-4 py-3 text-right space-x-2">
                                         <a href="{{ route('admin.vehicles.edit', $vehicle) }}" class="text-indigo-600 text-sm">Edit</a>
@@ -62,7 +60,7 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="6" class="px-4 py-8 text-center text-gray-500">No vehicles yet.</td></tr>
+                                <tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">No vehicles yet.</td></tr>
                             @endforelse
                         </tbody>
                     </table>

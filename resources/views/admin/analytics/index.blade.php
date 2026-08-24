@@ -37,11 +37,11 @@
                     <button type="submit"
                         formaction="{{ route('admin.analytics.export') }}"
                         class="inline-flex items-center justify-center px-4 py-2 bg-brand-orange text-white text-sm font-medium rounded-md hover:bg-brand-orange-700">
-                        Export Excel
+                        Export vehicle usage
                     </button>
                 </form>
                 <p class="mt-3 text-xs text-gray-500">
-                    Set the from/to date and time, then apply to refresh the dashboard or export Excel for that range. Today / this week cards stay current for quick context.
+                    Choose a from/to range, then export. The file lists each trip: user name, department, trip purpose, vehicle used, destination, and times. Default range is this month, including upcoming trips.
                 </p>
             </div>
 

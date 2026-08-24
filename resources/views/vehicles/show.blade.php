@@ -3,7 +3,7 @@
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ $vehicle->displayName() }}</h2>
-                <p class="text-sm text-gray-500">{{ $vehicle->category }} · {{ $vehicle->year_of_make }}</p>
+                <p class="text-sm text-gray-500">{{ $vehicle->category }}</p>
             </div>
             <a href="{{ route('vehicles.bookings.create', ['vehicle' => $vehicle->id, 'date' => $date->toDateString()]) }}"
                class="inline-flex items-center px-4 py-2 bg-emerald-600 text-white text-xs font-semibold uppercase rounded-md hover:bg-emerald-700">
@@ -16,9 +16,9 @@
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <div class="bg-white rounded-lg shadow-sm p-6 grid gap-2 sm:grid-cols-2 text-sm">
                 <p><span class="font-medium">Plate:</span> {{ $vehicle->number_plate }}</p>
-                <p><span class="font-medium">Chassis:</span> {{ $vehicle->chassis_number }}</p>
+                <p><span class="font-medium">Make:</span> {{ $vehicle->make }}</p>
                 <p><span class="font-medium">Engine:</span> {{ $vehicle->engine_capacity }}</p>
-                <p><span class="font-medium">Make / Year:</span> {{ $vehicle->make }} ({{ $vehicle->year_of_make }})</p>
+                <p><span class="font-medium">Category:</span> {{ $vehicle->category }}</p>
             </div>
 
             <div class="bg-white rounded-lg shadow-sm p-6">

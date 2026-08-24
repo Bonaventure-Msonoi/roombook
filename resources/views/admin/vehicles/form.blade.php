@@ -15,21 +15,9 @@
                         <x-input-error :messages="$errors->get('number_plate')" class="mt-1" />
                     </div>
                     <div>
-                        <x-input-label for="chassis_number" value="Chassis number" />
-                        <x-text-input id="chassis_number" name="chassis_number" class="mt-1 block w-full" :value="old('chassis_number', $vehicle->chassis_number)" required />
-                        <x-input-error :messages="$errors->get('chassis_number')" class="mt-1" />
-                    </div>
-                    <div class="grid gap-4 sm:grid-cols-2">
-                        <div>
-                            <x-input-label for="make" value="Make" />
-                            <x-text-input id="make" name="make" class="mt-1 block w-full" :value="old('make', $vehicle->make)" required />
-                            <x-input-error :messages="$errors->get('make')" class="mt-1" />
-                        </div>
-                        <div>
-                            <x-input-label for="year_of_make" value="Year of make" />
-                            <x-text-input id="year_of_make" name="year_of_make" type="number" class="mt-1 block w-full" :value="old('year_of_make', $vehicle->year_of_make)" required />
-                            <x-input-error :messages="$errors->get('year_of_make')" class="mt-1" />
-                        </div>
+                        <x-input-label for="make" value="Make" />
+                        <x-text-input id="make" name="make" class="mt-1 block w-full" :value="old('make', $vehicle->make)" required />
+                        <x-input-error :messages="$errors->get('make')" class="mt-1" />
                     </div>
                     <div class="grid gap-4 sm:grid-cols-2">
                         <div>
