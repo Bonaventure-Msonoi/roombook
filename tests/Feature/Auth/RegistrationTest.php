@@ -3,7 +3,9 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
+use App\Notifications\NewUserSignupAlert;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class RegistrationTest extends TestCase
@@ -19,6 +21,13 @@ class RegistrationTest extends TestCase
 
     public function test_new_users_can_register_but_remain_pending(): void
     {
+        Notification::fake();
+
+        $superUser = User::factory()->create([
+            'role' => User::ROLE_SUPER_USER,
+            'department' => 'Operations Dept',
+        ]);
+
         $response = $this->post('/register', [
             'name' => 'Test User',
             'email' => 'test@example.com',
@@ -35,5 +44,7 @@ class RegistrationTest extends TestCase
         $this->assertSame('HR', $user->department);
         $this->assertTrue($user->isPendingApproval());
         $this->assertFalse($user->isActive());
+
+        Notification::assertSentTo($superUser, NewUserSignupAlert::class);
     }
 }

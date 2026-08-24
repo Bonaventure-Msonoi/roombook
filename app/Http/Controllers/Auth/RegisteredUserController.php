@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Notifications\NewUserSignupAlert;
 use App\Services\AuditLogger;
+use App\Services\SuperUserAlerter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules;
@@ -54,6 +56,8 @@ class RegisteredUserController extends Controller
             $user,
             ['name' => $user->name, 'department' => $user->department]
         );
+
+        SuperUserAlerter::notify(new NewUserSignupAlert($user));
 
         return redirect()
             ->route('login')

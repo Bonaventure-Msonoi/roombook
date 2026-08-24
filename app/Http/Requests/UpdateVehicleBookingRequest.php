@@ -51,9 +51,26 @@ class UpdateVehicleBookingRequest extends FormRequest
             $booking = $this->route('vehicleBooking');
             $startsAt = Carbon::parse($this->input('starts_at'));
             $endsAt = Carbon::parse($this->input('ends_at'));
+            $ownerId = $this->user()?->canManageAnyBooking() && $this->filled('user_id')
+                ? (int) $this->input('user_id')
+                : $booking->user_id;
 
             if (VehicleBooking::hasConflict((int) $this->input('vehicle_id'), $startsAt, $endsAt, $booking->id)) {
                 $validator->errors()->add('starts_at', 'This vehicle is already booked for the selected time.');
+
+                return;
+            }
+
+            $userConflict = VehicleBooking::query()
+                ->confirmed()
+                ->where('user_id', $ownerId)
+                ->where('id', '!=', $booking->id)
+                ->where('starts_at', '<', $endsAt)
+                ->where('ends_at', '>', $startsAt)
+                ->exists();
+
+            if ($userConflict) {
+                $validator->errors()->add('starts_at', 'This user already has a vehicle booked for this time slot.');
             }
         });
     }

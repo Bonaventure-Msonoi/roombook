@@ -73,6 +73,11 @@ class User extends Authenticatable
         return $query->whereNotNull('approved_at');
     }
 
+    public function scopeSuperUsers($query)
+    {
+        return $query->where('role', self::ROLE_SUPER_USER);
+    }
+
     public function isActive(): bool
     {
         return (bool) $this->is_active;

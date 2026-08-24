@@ -47,9 +47,23 @@ class StoreVehicleBookingRequest extends FormRequest
 
             $startsAt = Carbon::parse($this->input('starts_at'));
             $endsAt = Carbon::parse($this->input('ends_at'));
+            $ownerId = $this->bookingOwnerId();
 
             if (VehicleBooking::hasConflict((int) $this->input('vehicle_id'), $startsAt, $endsAt)) {
                 $validator->errors()->add('starts_at', 'This vehicle is already booked for the selected time.');
+
+                return;
+            }
+
+            $userConflict = VehicleBooking::query()
+                ->confirmed()
+                ->where('user_id', $ownerId)
+                ->where('starts_at', '<', $endsAt)
+                ->where('ends_at', '>', $startsAt)
+                ->exists();
+
+            if ($userConflict) {
+                $validator->errors()->add('starts_at', 'You already have a vehicle booked for this time slot.');
             }
         });
     }

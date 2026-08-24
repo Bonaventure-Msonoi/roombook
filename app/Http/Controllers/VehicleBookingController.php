@@ -7,7 +7,10 @@ use App\Http\Requests\UpdateVehicleBookingRequest;
 use App\Models\User;
 use App\Models\Vehicle;
 use App\Models\VehicleBooking;
+use App\Notifications\VehicleBookingCancelledAlert;
+use App\Notifications\VehicleBookingCreatedAlert;
 use App\Services\AuditLogger;
+use App\Services\SuperUserAlerter;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -84,6 +87,8 @@ class VehicleBookingController extends Controller
                 'reason' => $request->input('reason'),
             ]
         );
+
+        SuperUserAlerter::notify(new VehicleBookingCreatedAlert($booking, $request->user()));
 
         return redirect()
             ->route('vehicles.dashboard')
@@ -220,6 +225,8 @@ class VehicleBookingController extends Controller
                 'reason' => $request->input('reason'),
             ]
         );
+
+        SuperUserAlerter::notify(new VehicleBookingCancelledAlert($vehicleBooking, $request->user()));
 
         return back()->with('status', 'Vehicle booking cancelled.');
     }
