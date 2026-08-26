@@ -25,8 +25,10 @@ class DashboardController extends Controller
             ->map(fn (Booking $booking) => [
                 'id' => $booking->id,
                 'title' => $booking->room->name.' — '.$booking->title,
-                'start' => $booking->starts_at->toIso8601String(),
-                'end' => $booking->ends_at->toIso8601String(),
+                // Floating local wall-clock times (no UTC offset) so the calendar
+                // shows exactly what the user booked, regardless of browser TZ.
+                'start' => $booking->starts_at->format('Y-m-d\TH:i:s'),
+                'end' => $booking->ends_at->format('Y-m-d\TH:i:s'),
                 'backgroundColor' => $booking->room->color,
                 'borderColor' => $booking->room->color,
                 'extendedProps' => [

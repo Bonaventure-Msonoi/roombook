@@ -97,6 +97,7 @@
             <div class="p-6">
                 <h2 class="text-lg font-semibold text-gray-900">Book a room</h2>
                 <p class="mt-1 text-sm text-gray-500" x-text="modalTimeLabel"></p>
+                <p class="mt-1 text-sm font-medium text-gray-800" x-text="durationLabel" x-show="durationLabel"></p>
 
                 <form method="POST" action="{{ route('boardroom.bookings.store') }}" class="mt-6 space-y-4">
                     @csrf
@@ -126,7 +127,7 @@
                             <x-input-label for="modal_starts_at" :value="__('Start time')" />
                             <input id="modal_starts_at" name="starts_at" type="datetime-local"
                                    x-model="startsAt"
-                                   @change="refreshAvailability()"
+                                   @change="onStartChanged()"
                                    :min="minDateTime"
                                    :max="maxDateTime"
                                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
@@ -136,7 +137,7 @@
                             <x-input-label for="modal_ends_at" :value="__('End time')" />
                             <input id="modal_ends_at" name="ends_at" type="datetime-local"
                                    x-model="endsAt"
-                                   @change="refreshAvailability()"
+                                   @change="onEndChanged()"
                                    :min="minDateTime"
                                    :max="maxDateTime"
                                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
@@ -170,6 +171,13 @@
             }
             .fc-event { cursor: pointer; }
             .fc .fc-highlight { background: rgba(237, 27, 46, 0.18); }
+            .fc .fc-timegrid-now-indicator-line {
+                border-color: #ed1b2e;
+                border-width: 2px;
+            }
+            .fc .fc-timegrid-now-indicator-arrow {
+                border-color: #ed1b2e;
+            }
             @media (max-width: 639px) {
                 .fc .fc-toolbar { flex-wrap: wrap; gap: 0.5rem; }
                 .fc .fc-toolbar-title { font-size: 1rem; }
@@ -189,9 +197,44 @@
                     'T' + pad(date.getHours()) + ':' + pad(date.getMinutes());
             }
 
+            function parseLocalInput(value) {
+                if (!value) return null;
+                const [datePart, timePart] = value.split('T');
+                if (!datePart || !timePart) return null;
+                const [year, month, day] = datePart.split('-').map(Number);
+                const [hour, minute] = timePart.split(':').map(Number);
+                return new Date(year, month - 1, day, hour, minute || 0, 0);
+            }
+
+            function formatDuration(start, end) {
+                const minutes = Math.round((end.getTime() - start.getTime()) / 60000);
+                if (!Number.isFinite(minutes) || minutes <= 0) return '';
+                const hours = Math.floor(minutes / 60);
+                const mins = minutes % 60;
+                if (hours && mins) return `Duration: ${hours}h ${mins}m`;
+                if (hours) return `Duration: ${hours} hour${hours === 1 ? '' : 's'}`;
+                return `Duration: ${mins} minute${mins === 1 ? '' : 's'}`;
+            }
+
             function formatLabel(start, end) {
                 const opts = { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' };
                 return start.toLocaleString(undefined, opts) + ' – ' + end.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+            }
+
+            function lusakaNow() {
+                const parts = new Intl.DateTimeFormat('en-GB', {
+                    timeZone: 'Africa/Lusaka',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false,
+                }).formatToParts(new Date());
+                const value = (type) => Number(parts.find((part) => part.type === type)?.value || 0);
+
+                return new Date(value('year'), value('month') - 1, value('day'), value('hour'), value('minute'), value('second'));
             }
 
             function roomCalendar() {
@@ -210,9 +253,40 @@
                     selectedRoomId: '',
                     roomAvailability: ROOMS.map(r => ({ ...r, available: true })),
                     modalTimeLabel: '',
+                    durationMinutes: null,
+                    durationLabel: '',
 
                     get roomDayLabel() {
                         return this.roomDay.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+                    },
+
+                    syncDurationLabel() {
+                        const start = parseLocalInput(this.startsAt);
+                        const end = parseLocalInput(this.endsAt);
+                        if (!start || !end) {
+                            this.durationMinutes = null;
+                            this.durationLabel = '';
+                            return;
+                        }
+
+                        this.durationMinutes = Math.round((end.getTime() - start.getTime()) / 60000);
+                        this.durationLabel = formatDuration(start, end);
+                        this.modalTimeLabel = formatLabel(start, end);
+                    },
+
+                    onStartChanged() {
+                        const start = parseLocalInput(this.startsAt);
+                        if (start && this.durationMinutes && this.durationMinutes > 0) {
+                            const end = new Date(start.getTime() + this.durationMinutes * 60000);
+                            this.endsAt = toLocalInput(end);
+                        }
+                        this.syncDurationLabel();
+                        this.refreshAvailability();
+                    },
+
+                    onEndChanged() {
+                        this.syncDurationLabel();
+                        this.refreshAvailability();
                     },
 
                     init() {
@@ -220,7 +294,7 @@
                             this.startsAt = @json(old('starts_at'));
                             this.endsAt = @json(old('ends_at'));
                             this.selectedRoomId = @json((string) old('room_id', ''));
-                            this.modalTimeLabel = 'Adjust your booking details';
+                            this.syncDurationLabel();
                             this.$nextTick(() => {
                                 this.refreshAvailability().then(() => this.$dispatch('open-modal', 'book-room'));
                             });
@@ -289,7 +363,7 @@
 
                         this.startsAt = toLocalInput(start);
                         this.endsAt = toLocalInput(end);
-                        this.modalTimeLabel = formatLabel(start, end);
+                        this.syncDurationLabel();
                         await this.refreshAvailability();
 
                         if (roomId) {
@@ -343,11 +417,13 @@
 
                     sharedCalendarOptions(extra = {}) {
                         return {
+                            timeZone: 'local',
                             slotMinTime: '07:00:00',
                             slotMaxTime: '20:00:00',
                             slotDuration: '00:30:00',
                             snapDuration: '00:15:00',
                             allDaySlot: false,
+                            now: lusakaNow,
                             nowIndicator: true,
                             height: 'auto',
                             selectable: true,

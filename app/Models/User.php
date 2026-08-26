@@ -28,6 +28,7 @@ class User extends Authenticatable
         'Investments',
         'Legal & Administration',
         'Operations Dept',
+        'Business Distribution',
     ];
 
     protected $fillable = [

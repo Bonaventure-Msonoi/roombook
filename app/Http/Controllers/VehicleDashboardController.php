@@ -25,8 +25,10 @@ class VehicleDashboardController extends Controller
             ->map(fn (VehicleBooking $booking) => [
                 'id' => $booking->id,
                 'title' => $booking->vehicle->displayName().' — '.$booking->title,
-                'start' => $booking->starts_at->toIso8601String(),
-                'end' => $booking->ends_at->toIso8601String(),
+                // Floating local wall-clock times (no UTC offset) so the calendar
+                // shows exactly what the user booked, regardless of browser TZ.
+                'start' => $booking->starts_at->format('Y-m-d\TH:i:s'),
+                'end' => $booking->ends_at->format('Y-m-d\TH:i:s'),
                 'backgroundColor' => $booking->vehicle->color,
                 'borderColor' => $booking->vehicle->color,
                 'extendedProps' => [

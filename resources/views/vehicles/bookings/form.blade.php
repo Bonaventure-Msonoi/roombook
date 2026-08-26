@@ -82,6 +82,7 @@
                             :value="old('ends_at', $selectedEndsAt ?? ($selectedDate ? $selectedDate.'T17:00' : ''))" required />
                         <x-input-error class="mt-2" :messages="$errors->get('ends_at')" />
                     </div>
+                    <p id="booking-duration-label" class="text-sm font-medium text-gray-800"></p>
 
                     @if ($booking->exists || $canBookOnBehalf)
                         <div>
@@ -101,4 +102,62 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+        <script>
+            (function () {
+                const startInput = document.getElementById('starts_at');
+                const endInput = document.getElementById('ends_at');
+                const label = document.getElementById('booking-duration-label');
+                if (!startInput || !endInput || !label) return;
+
+                let durationMinutes = null;
+
+                function parseLocal(value) {
+                    if (!value) return null;
+                    const [datePart, timePart] = value.split('T');
+                    if (!datePart || !timePart) return null;
+                    const [year, month, day] = datePart.split('-').map(Number);
+                    const [hour, minute] = timePart.split(':').map(Number);
+                    return new Date(year, month - 1, day, hour, minute || 0, 0);
+                }
+
+                function toLocal(date) {
+                    const pad = (n) => String(n).padStart(2, '0');
+                    return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate()) +
+                        'T' + pad(date.getHours()) + ':' + pad(date.getMinutes());
+                }
+
+                function syncLabel() {
+                    const start = parseLocal(startInput.value);
+                    const end = parseLocal(endInput.value);
+                    if (!start || !end) {
+                        label.textContent = '';
+                        durationMinutes = null;
+                        return;
+                    }
+                    durationMinutes = Math.round((end - start) / 60000);
+                    if (durationMinutes <= 0) {
+                        label.textContent = '';
+                        return;
+                    }
+                    const hours = Math.floor(durationMinutes / 60);
+                    const mins = durationMinutes % 60;
+                    if (hours && mins) label.textContent = `Duration: ${hours}h ${mins}m`;
+                    else if (hours) label.textContent = `Duration: ${hours} hour${hours === 1 ? '' : 's'}`;
+                    else label.textContent = `Duration: ${mins} minute${mins === 1 ? '' : 's'}`;
+                }
+
+                startInput.addEventListener('change', () => {
+                    const start = parseLocal(startInput.value);
+                    if (start && durationMinutes && durationMinutes > 0) {
+                        endInput.value = toLocal(new Date(start.getTime() + durationMinutes * 60000));
+                    }
+                    syncLabel();
+                });
+                endInput.addEventListener('change', syncLabel);
+                syncLabel();
+            })();
+        </script>
+    @endpush
 </x-app-layout>
