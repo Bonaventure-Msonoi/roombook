@@ -40,6 +40,11 @@
                             {{ __('Manage Users') }}
                         </x-nav-link>
                     @endif
+                    @if (Auth::user()->canManageWalkInFeedback())
+                        <x-nav-link :href="route('service-desk.feedback.index')" :active="request()->routeIs('service-desk.feedback.*')">
+                            {{ __('Customer Feedback') }}
+                        </x-nav-link>
+                    @endif
                     @if (Auth::user()->canManageRolePrivileges())
                         <x-nav-link :href="route('admin.role-privileges.edit')" :active="request()->routeIs('admin.role-privileges.*')">
                             {{ __('Role Privileges') }}
@@ -104,6 +109,9 @@
             @endif
             @if (Auth::user()->canManageUsers())
                 <x-responsive-nav-link :href="route('admin.users.index')">Manage Users</x-responsive-nav-link>
+            @endif
+            @if (Auth::user()->canManageWalkInFeedback())
+                <x-responsive-nav-link :href="route('service-desk.feedback.index')">Customer Feedback</x-responsive-nav-link>
             @endif
             @if (Auth::user()->canManageRolePrivileges())
                 <x-responsive-nav-link :href="route('admin.role-privileges.edit')">Role Privileges</x-responsive-nav-link>

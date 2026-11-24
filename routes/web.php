@@ -13,6 +13,8 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\VehicleBookingController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\VehicleDashboardController;
+use App\Http\Controllers\WalkInFeedbackController;
+use App\Http\Controllers\ServiceDesk\WalkInFeedbackController as ServiceDeskWalkInFeedbackController;
 use App\Support\Privileges;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +22,14 @@ Route::get('/', function () {
     return auth()->check()
         ? redirect()->route('home')
         : redirect()->route('login');
+});
+
+Route::prefix('walk-in')->name('walk-in.')->group(function () {
+    Route::get('/', fn () => redirect()->route('walk-in.feedback.create'))->name('index');
+    Route::get('/feedback', [WalkInFeedbackController::class, 'create'])->name('feedback.create');
+    Route::post('/feedback', [WalkInFeedbackController::class, 'store'])
+        ->middleware('throttle:20,1')
+        ->name('feedback.store');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -92,6 +102,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('/{user}/reject', [UserManagementController::class, 'reject'])->name('reject');
         Route::patch('/{user}/deactivate', [UserManagementController::class, 'deactivate'])->name('deactivate');
         Route::patch('/{user}/reactivate', [UserManagementController::class, 'reactivate'])->name('reactivate');
+    });
+
+    Route::prefix('service-desk/feedback')->name('service-desk.feedback.')->middleware('privilege:'.Privileges::MANAGE_WALKIN_FEEDBACK)->group(function () {
+        Route::get('/', [ServiceDeskWalkInFeedbackController::class, 'index'])->name('index');
+        Route::get('/export', [ServiceDeskWalkInFeedbackController::class, 'export'])->name('export');
     });
 
     Route::prefix('admin/vehicles')->name('admin.vehicles.')->middleware('privilege:'.Privileges::MANAGE_VEHICLES)->group(function () {

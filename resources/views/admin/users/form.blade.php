@@ -54,6 +54,8 @@
                         <x-input-error :messages="$errors->get('role')" class="mt-1" />
                     </div>
 
+                    @include('admin.users.partials.assignable-privileges', ['user' => $user])
+
                     @if (! $user->exists)
                         <div>
                             <x-input-label for="password" value="Password" />

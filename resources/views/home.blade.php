@@ -11,7 +11,8 @@
                 $user = Auth::user();
                 $canBookBoardroom = $user->canBookBoardroom();
                 $canBookVehicles = $user->canBookVehicles();
-                $moduleCount = (int) $canBookBoardroom + (int) $canBookVehicles;
+                $canServiceDesk = $user->canManageWalkInFeedback();
+                $moduleCount = (int) $canBookBoardroom + (int) $canBookVehicles + (int) $canServiceDesk;
             @endphp
 
             @if ($moduleCount > 0)
@@ -51,10 +52,25 @@
                             </x-slot:icon>
                         </x-booking-module-card>
                     @endif
+
+                    @if ($canServiceDesk)
+                        <x-booking-module-card
+                            :href="route('service-desk.feedback.index')"
+                            title="Customer feedback"
+                            description="View walk-in submissions and export feedback to Excel."
+                            variant="red"
+                        >
+                            <x-slot:icon>
+                                <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h6m-6 4h8M5 6a2 2 0 012-2h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6z"/>
+                                </svg>
+                            </x-slot:icon>
+                        </x-booking-module-card>
+                    @endif
                 </div>
             @else
                 <div class="rounded-lg border border-gray-200 bg-white p-6 text-center text-sm text-gray-600">
-                    You do not have access to any booking modules yet. Contact a super user if you need Boardroom or Pool Vehicle access.
+                    You do not have access to any modules yet. Contact an administrator if you need Boardroom, Pool Vehicle, or service desk access.
                 </div>
             @endif
 
@@ -64,7 +80,8 @@
                     || $user->canManageVehicles()
                     || $user->canManageUsers()
                     || $user->canManageRolePrivileges()
-                    || $user->canViewAuditLog();
+                    || $user->canViewAuditLog()
+                    || $user->canManageWalkInFeedback();
             @endphp
 
             @if ($showAdminTools)
@@ -100,6 +117,16 @@
                             <a href="{{ route('admin.audit-logs.index') }}"
                                class="inline-flex items-center px-4 py-2 border border-brand-turquoise-300 text-brand-turquoise-900 text-sm font-medium rounded-md hover:bg-brand-turquoise-50">
                                 Audit log
+                            </a>
+                        @endif
+                        @if ($user->canManageWalkInFeedback())
+                            <a href="{{ route('service-desk.feedback.index') }}"
+                               class="inline-flex items-center px-4 py-2 border border-brand-soft-300 text-brand-soft-900 text-sm font-medium rounded-md hover:bg-brand-soft-50">
+                                Walk-in feedback
+                            </a>
+                            <a href="{{ route('walk-in.feedback.create') }}" target="_blank" rel="noopener"
+                               class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-800 text-sm font-medium rounded-md hover:bg-gray-50">
+                                Kiosk form ↗
                             </a>
                         @endif
                         @if ($user->canAccessAdminDashboard() && $user->canBookBoardroom())

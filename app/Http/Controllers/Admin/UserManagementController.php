@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\UserPrivilege;
 use App\Services\AuditLogger;
+use App\Support\Privileges;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -51,6 +53,8 @@ class UserManagementController extends Controller
             'approved_at' => now(),
         ]);
 
+        $this->syncAssignablePrivileges($user, $request);
+
         AuditLogger::log(
             'user.created',
             "User created: {$user->email}",
@@ -84,6 +88,8 @@ class UserManagementController extends Controller
         $before = $user->only(['name', 'email', 'department', 'role']);
         $user->update($data);
 
+        $this->syncAssignablePrivileges($user, $request);
+
         AuditLogger::log(
             'user.updated',
             "User updated: {$user->email}",
@@ -116,6 +122,8 @@ class UserManagementController extends Controller
             'approved_at' => now(),
             'rejected_at' => null,
         ]);
+
+        $this->syncAssignablePrivileges($user, $request);
 
         AuditLogger::log(
             'user.approved',
@@ -238,5 +246,26 @@ class UserManagementController extends Controller
             User::ROLE_ADMIN => 'Admin',
             User::ROLE_SUPER_USER => 'Super User',
         ];
+    }
+
+    private function syncAssignablePrivileges(User $user, Request $request): void
+    {
+        $allowed = array_keys(Privileges::assignableToUsers());
+        $selected = $request->input('assignable_privileges', []);
+        $selected = is_array($selected)
+            ? array_values(array_intersect($selected, $allowed))
+            : [];
+
+        UserPrivilege::query()
+            ->where('user_id', $user->id)
+            ->whereIn('privilege', $allowed)
+            ->delete();
+
+        foreach ($selected as $privilege) {
+            UserPrivilege::create([
+                'user_id' => $user->id,
+                'privilege' => $privilege,
+            ]);
+        }
     }
 }

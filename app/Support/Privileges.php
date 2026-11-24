@@ -22,6 +22,8 @@ class Privileges
 
     public const MANAGE_USERS = 'manage_users';
 
+    public const MANAGE_WALKIN_FEEDBACK = 'manage_walkin_feedback';
+
     /**
      * @return array<string, string>
      */
@@ -37,6 +39,19 @@ class Privileges
             self::VIEW_AUDIT_LOG => 'View the audit log',
             self::MANAGE_VEHICLES => 'Manage the vehicle pool',
             self::MANAGE_USERS => 'Create and manage users',
+            self::MANAGE_WALKIN_FEEDBACK => 'Service desk — view and export walk-in customer feedback',
+        ];
+    }
+
+    /**
+     * Extra privileges admins can stack on top of a user's base role (e.g. staff + service desk).
+     *
+     * @return array<string, string>
+     */
+    public static function assignableToUsers(): array
+    {
+        return [
+            self::MANAGE_WALKIN_FEEDBACK => 'Service desk (walk-in feedback)',
         ];
     }
 

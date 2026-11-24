@@ -6,6 +6,7 @@ use App\Support\Privileges;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -122,6 +123,26 @@ class User extends Authenticatable
         return $this->hasMany(VehicleBooking::class);
     }
 
+    public function userPrivileges(): HasMany
+    {
+        return $this->hasMany(UserPrivilege::class);
+    }
+
+    /**
+     * @return Collection<int, string>
+     */
+    public function assignablePrivilegeKeys(): Collection
+    {
+        return $this->userPrivileges()
+            ->whereIn('privilege', array_keys(Privileges::assignableToUsers()))
+            ->pluck('privilege');
+    }
+
+    public function hasAssignablePrivilege(string $privilege): bool
+    {
+        return $this->userPrivileges()->where('privilege', $privilege)->exists();
+    }
+
     public function isUser(): bool
     {
         return $this->role === self::ROLE_USER;
@@ -143,7 +164,11 @@ class User extends Authenticatable
             return true;
         }
 
-        return RolePrivilege::roleHas($this->role, $privilege);
+        if (RolePrivilege::roleHas($this->role, $privilege)) {
+            return true;
+        }
+
+        return $this->hasAssignablePrivilege($privilege);
     }
 
     public function canBookBoardroom(): bool
@@ -199,5 +224,10 @@ class User extends Authenticatable
     public function canViewAuditLog(): bool
     {
         return $this->hasPrivilege(Privileges::VIEW_AUDIT_LOG);
+    }
+
+    public function canManageWalkInFeedback(): bool
+    {
+        return $this->hasPrivilege(Privileges::MANAGE_WALKIN_FEEDBACK);
     }
 }

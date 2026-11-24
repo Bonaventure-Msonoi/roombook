@@ -42,6 +42,10 @@
                                             <option value="super_user">Super User</option>
                                         </select>
                                     </div>
+                                    <label class="flex items-center gap-1.5 text-xs text-gray-600">
+                                        <input type="checkbox" name="assignable_privileges[]" value="{{ \App\Support\Privileges::MANAGE_WALKIN_FEEDBACK }}" class="rounded border-gray-300 text-indigo-600">
+                                        Service desk
+                                    </label>
                                     <button type="submit" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
                                         Approve
                                     </button>
@@ -85,6 +89,10 @@
                                                         <option value="admin">Admin</option>
                                                         <option value="super_user">Super User</option>
                                                     </select>
+                                                    <label class="flex items-center gap-1.5 text-xs text-gray-600 mr-2">
+                                                        <input type="checkbox" name="assignable_privileges[]" value="{{ \App\Support\Privileges::MANAGE_WALKIN_FEEDBACK }}" class="rounded border-gray-300 text-indigo-600">
+                                                        Service desk
+                                                    </label>
                                                     <button type="submit" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
                                                         Approve
                                                     </button>

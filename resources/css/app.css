@@ -25,4 +25,339 @@
     .brand-guest-bg {
         background-color: var(--brand-surface);
     }
+
+    /* Walk-in kiosk (tablet / front desk) — Verdana, calm Prudential look */
+    .walk-in-page {
+        background: linear-gradient(180deg, #f0f1f3 0%, #f7f8fa 40%, #f7f8fa 100%);
+    }
+
+    .walk-in-brand-bar {
+        background: #fff;
+        border-bottom: 1px solid #e5e7eb;
+        box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+    }
+
+    .walk-in-kiosk {
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        font-size: 1.0625rem;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+    }
+
+    @media (min-width: 640px) {
+        .walk-in-kiosk {
+            font-size: 1.125rem;
+        }
+    }
+
+    .walk-in-card {
+        background: #fff;
+        border-radius: 1rem;
+        box-shadow: 0 1px 3px rgb(0 0 0 / 0.06), 0 8px 24px rgb(0 0 0 / 0.04);
+    }
+
+    .walk-in-steps .step-pill {
+        color: #6b7280;
+        font-size: 0.9375rem;
+        letter-spacing: 0.02em;
+    }
+
+    @media (min-width: 640px) {
+        .walk-in-steps .step-pill {
+            font-size: 1.0625rem;
+        }
+    }
+
+    .walk-in-steps .step-pill--active {
+        color: #111827;
+        font-weight: 700;
+    }
+
+    .walk-in-btn-primary {
+        background-color: var(--brand-red);
+        color: #fff;
+    }
+
+    .walk-in-btn-primary:hover {
+        filter: brightness(0.95);
+    }
+
+    .walk-in-btn-ghost {
+        background: transparent;
+        color: #374151;
+        border: 1px solid #d1d5db;
+    }
+
+    .walk-in-field {
+        border-radius: 0.5rem;
+        border-color: #e5e7eb;
+    }
+
+    .walk-in-satisfaction-grid {
+        padding-top: 2.25rem;
+    }
+
+    .walk-in-satisfaction-grid--compact {
+        padding-top: 1.65rem;
+    }
+
+    html.walk-in-step-2,
+    html.walk-in-step-2 body {
+        height: 100%;
+        max-height: 100dvh;
+        overflow: hidden;
+    }
+
+    html.walk-in-step-2 .walk-in-body {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        max-height: 100dvh;
+        overflow: hidden;
+    }
+
+    html.walk-in-step-2 .walk-in-body main {
+        max-width: 48rem;
+        height: 100%;
+        max-height: calc(100dvh - 1rem);
+        display: flex;
+        flex-direction: column;
+    }
+
+    html.walk-in-step-2 .walk-in-steps {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    html.walk-in-step-2 .walk-in-card--step2 {
+        flex: 0 1 auto;
+        min-height: 0;
+        max-height: calc(100dvh - 2.5rem);
+        overflow-y: auto;
+    }
+
+    html.walk-in-step-2 .walk-in-step2-panel {
+        overflow: visible;
+    }
+
+    html.walk-in-step-2 .walk-in-card--step2 form {
+        flex: 0 1 auto;
+        min-height: 0;
+        height: auto;
+    }
+
+  .walk-in-card--step1 form.walk-in-form {
+        flex: 0 1 auto;
+        height: auto;
+    }
+
+    html.walk-in-step-2 .kiosk-score-btn {
+        min-width: 2.375rem;
+        min-height: 2.375rem;
+        font-size: 1rem;
+    }
+
+    .walk-in-satisfaction-emoji {
+        position: absolute;
+        left: 50%;
+        top: -2rem;
+        transform: translateX(-50%);
+        font-size: 1.65rem;
+        line-height: 1;
+        pointer-events: none;
+        filter: drop-shadow(0 2px 5px rgb(0 0 0 / 0.15));
+        z-index: 2;
+    }
+
+    .walk-in-satisfaction-emoji.is-popping {
+        animation: walk-in-emoji-pop 0.45s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+    }
+
+    @keyframes walk-in-emoji-pop {
+        0% {
+            transform: translateX(-50%) translateY(12px) scale(0.35);
+            opacity: 0;
+        }
+        70% {
+            transform: translateX(-50%) translateY(-14px) scale(1.2);
+            opacity: 1;
+        }
+        100% {
+            transform: translateX(-50%) translateY(-8px) scale(1.05);
+            opacity: 1;
+        }
+    }
+
+    .walk-in-mood {
+        position: relative;
+        display: inline-block;
+        min-width: 2.25rem;
+        text-align: center;
+    }
+
+    .walk-in-mood-face {
+        display: block;
+        font-size: 1.65rem;
+        line-height: 1;
+    }
+
+  /* Very dissatisfied — wobble + falling tears */
+    .walk-in-mood--1 .walk-in-mood-face {
+        animation: mood-sad-shake 2.2s ease-in-out infinite;
+    }
+
+    .walk-in-mood-tear {
+        position: absolute;
+        width: 5px;
+        height: 9px;
+        background: linear-gradient(180deg, #bae6fd 0%, #3b82f6 100%);
+        border-radius: 999px;
+        top: 58%;
+        opacity: 0;
+        pointer-events: none;
+        animation: mood-tear-fall 1.5s ease-in infinite;
+    }
+
+    .walk-in-mood-tear--a {
+        left: 32%;
+    }
+
+    .walk-in-mood-tear--b {
+        left: 58%;
+        animation-delay: 0.55s;
+    }
+
+    @keyframes mood-tear-fall {
+        0%, 12% {
+            opacity: 0;
+            transform: translateY(0) scale(0.5);
+        }
+        22% {
+            opacity: 1;
+        }
+        100% {
+            opacity: 0;
+            transform: translateY(1.35rem) scale(1);
+        }
+    }
+
+    @keyframes mood-sad-shake {
+        0%, 100% {
+            transform: translateX(0);
+        }
+        25% {
+            transform: translateX(-2px);
+        }
+        75% {
+            transform: translateX(2px);
+        }
+    }
+
+  /* Dissatisfied — slow droop */
+    .walk-in-mood--2 .walk-in-mood-face {
+        animation: mood-droop 2.8s ease-in-out infinite;
+    }
+
+    @keyframes mood-droop {
+        0%, 100% {
+            transform: translateY(0) scale(1);
+        }
+        50% {
+            transform: translateY(2px) scale(0.96);
+        }
+    }
+
+  /* Neutral — gentle breathe */
+    .walk-in-mood--3 .walk-in-mood-face {
+        animation: mood-breathe 3s ease-in-out infinite;
+    }
+
+    @keyframes mood-breathe {
+        0%, 100% {
+            transform: scale(1);
+            opacity: 0.92;
+        }
+        50% {
+            transform: scale(1.04);
+            opacity: 1;
+        }
+    }
+
+  /* Satisfied — happy bounce */
+    .walk-in-mood--4 .walk-in-mood-face {
+        animation: mood-happy-bounce 1.8s ease-in-out infinite;
+    }
+
+    @keyframes mood-happy-bounce {
+        0%, 100% {
+            transform: translateY(0) scale(1);
+        }
+        40% {
+            transform: translateY(-4px) scale(1.06);
+        }
+    }
+
+  /* Very satisfied — warm smile (calmer than laugh) */
+    .walk-in-mood--5 .walk-in-mood-face {
+        animation: mood-very-happy 2s ease-in-out infinite;
+    }
+
+    @keyframes mood-very-happy {
+        0%, 100% {
+            transform: translateY(0) scale(1);
+        }
+        50% {
+            transform: translateY(-3px) scale(1.08);
+        }
+    }
+
+    .walk-in-welcome {
+        color: #4b5563;
+        line-height: 1.65;
+        font-size: 1.0625rem;
+    }
+
+    @media (min-width: 768px) {
+        .walk-in-welcome {
+            font-size: 1.125rem;
+        }
+    }
+
+    .walk-in-kiosk input,
+    .walk-in-kiosk textarea,
+    .walk-in-kiosk select,
+    .walk-in-kiosk button {
+        font-family: inherit;
+    }
+
+    .walk-in-kiosk .kiosk-score-btn {
+        min-width: 2.625rem;
+        min-height: 2.625rem;
+    }
+
+    @media (min-width: 768px) {
+        .walk-in-kiosk .kiosk-score-btn {
+            min-width: 3.125rem;
+            min-height: 3.125rem;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .walk-in-kiosk .kiosk-score-btn {
+            min-width: 3.375rem;
+            min-height: 3.375rem;
+        }
+    }
+
+    .walk-in-steps [x-cloak] {
+        display: none !important;
+    }
+
+    /* Typical tablet portrait (e.g. Tab S9 FE ~800px) */
+    @media (min-width: 600px) and (max-width: 1100px) {
+        .walk-in-kiosk .walk-in-steps form {
+            font-size: 1.05rem;
+        }
+    }
 }
